@@ -1,10 +1,22 @@
 import { Group } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
-import MODEL from './flower.gltf';
+import TWEEN from 'three/examples/jsm/libs/tween.module.js';
+
+import SeedScene from '../scenes/SeedScene';
+
+// Import flower model as a URL using Vite's syntax
+import MODEL from './flower.gltf?url';
 
 class Flower extends Group {
-    constructor(parent) {
+    // Define the type of the state field
+    state: {
+        gui: dat.GUI;
+        bob: boolean;
+        spin: () => void;
+        twirl: number;
+    };
+
+    constructor(parent: SeedScene) {
         // Call parent Group() constructor
         super();
 
@@ -12,7 +24,7 @@ class Flower extends Group {
         this.state = {
             gui: parent.state.gui,
             bob: true,
-            spin: (() => this.spin()), // or this.spin.bind(this)
+            spin: () => this.spin(), // or this.spin.bind(this)
             twirl: 0,
         };
 
@@ -32,7 +44,7 @@ class Flower extends Group {
         this.state.gui.add(this.state, 'spin');
     }
 
-    spin() {
+    spin(): void {
         // Add a simple twirl
         this.state.twirl += 6 * Math.PI;
 
@@ -53,7 +65,7 @@ class Flower extends Group {
         jumpUp.start();
     }
 
-    update(timeStamp) {
+    update(timeStamp: number): void {
         if (this.state.bob) {
             // Bob back and forth
             this.rotation.z = 0.05 * Math.sin(timeStamp / 300);

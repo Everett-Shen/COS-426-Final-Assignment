@@ -1,6 +1,8 @@
 import { Group } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import MODEL from './land.gltf';
+
+// Import land model as a URL using Vite's syntax
+import MODEL from './land.gltf?url';
 
 class Land extends Group {
     constructor() {
