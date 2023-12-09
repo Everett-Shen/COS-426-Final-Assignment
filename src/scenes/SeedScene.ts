@@ -11,7 +11,7 @@ type UpdateChild = {
     // Each object *might* contain an update function
     update?: (timeStamp: number) => void;
 };
-
+const RACCOON_COUNT = 5;
 class SeedScene extends Scene {
     // Define the type of the state field
     state: {
@@ -27,7 +27,7 @@ class SeedScene extends Scene {
         // Init state
         this.state = {
             gui: new dat.GUI(), // Create GUI for scene
-            rotationSpeed: 1,
+            rotationSpeed: 0,
             updateList: [],
         };
 
@@ -38,9 +38,12 @@ class SeedScene extends Scene {
         const land = new Land();
         // const flower = new Flower(this);
         const lights = new BasicLights();
-        const raccoon = new Raccoon(this);
-        this.add(lights, raccoon);
+        this.add(lights);
 
+        // add raccoons
+        for (let i = 0; i < RACCOON_COUNT; i++) {
+            this.add(new Raccoon(this));
+        }
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }

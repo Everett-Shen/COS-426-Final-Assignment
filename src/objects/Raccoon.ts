@@ -6,14 +6,16 @@ import TWEEN from 'three/examples/jsm/libs/tween.module.js';
 import SeedScene from '../scenes/SeedScene';
 
 import MODEL from './animated_raccoon.glb?url';
-let mixer;
+
 class Raccoon extends Group {
     state: {
         gui: dat.GUI;
         animate: boolean;
         clock: THREE.Clock;
+        speed: number;
+        direction: number;
     };
-
+    mixer: THREE.AnimationMixer;
     constructor(parent: SeedScene) {
         super();
 
@@ -22,6 +24,8 @@ class Raccoon extends Group {
             gui: parent.state.gui,
             animate: true,
             clock: new THREE.Clock(),
+            speed: 0.1,
+            direction: Math.random() * 2 * Math.PI,
         };
 
         // Load FBX model
@@ -29,10 +33,10 @@ class Raccoon extends Group {
 
         this.name = 'myFBXObject';
         loader.load(MODEL, (gltf) => {
-            mixer = new THREE.AnimationMixer(gltf.scene);
-            mixer.clipAction(gltf.animations[6]).play(); // run
+            this.mixer = new THREE.AnimationMixer(gltf.scene);
+            this.mixer.clipAction(gltf.animations[6]).play(); // run
             // Play all animations
-            gltf.animations.forEach((clip) => {});
+            // gltf.animations.forEach((clip) => {});
             gltf.scene.scale.set(0.05, 0.05, 0.05);
             this.add(gltf.scene);
         });
@@ -48,10 +52,17 @@ class Raccoon extends Group {
         if (this.state.animate) {
             // Animation logic here
             // For example, simple rotation:
-            this.rotation.y += 0.01;
-            if (mixer) {
-                mixer.update(this.state.clock.getDelta());
+            // this.rotation.y += 0.01;
+            if (this.mixer) {
+                this.mixer.update(this.state.clock.getDelta());
             }
+            this.position.z += this.state.speed;
+            this.rotation.y = this.state.direction;
+            const deltaX = Math.sin(this.state.direction) * this.state.speed;
+            const deltaZ = Math.cos(this.state.direction) * this.state.speed;
+
+            this.position.x += deltaX;
+            this.position.z += deltaZ;
         }
 
         // Advance tween animations, if any exist
