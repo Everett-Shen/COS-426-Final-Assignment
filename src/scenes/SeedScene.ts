@@ -2,6 +2,7 @@ import dat from 'dat.gui';
 import { Scene, Color } from 'three';
 
 import Flower from '../objects/Flower';
+import Raccoon from '../objects/Raccoon';
 import Land from '../objects/Land';
 import BasicLights from '../lights/BasicLights';
 
@@ -35,9 +36,10 @@ class SeedScene extends Scene {
 
         // Add meshes to scene
         const land = new Land();
-        const flower = new Flower(this);
+        // const flower = new Flower(this);
         const lights = new BasicLights();
-        this.add(land, flower, lights);
+        const raccoon = new Raccoon(this);
+        this.add(lights, raccoon);
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
