@@ -2,7 +2,7 @@ import { Group } from 'three';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-import SeedScene from '../scenes/SeedScene';
+import SeedScene, { assignRandomPosition } from '../scenes/SeedScene';
 
 import MODEL from './animated_raccoon.glb?url';
 
@@ -13,6 +13,7 @@ class Raccoon extends Group {
         // clock: THREE.Clock;
         speed: number;
         direction: number;
+        lastUpdatedTimestep: number
     };
     mixer: THREE.AnimationMixer;
     constructor(parent: SeedScene) {
@@ -24,6 +25,7 @@ class Raccoon extends Group {
             animate: true,
             speed: 0.1,
             direction: Math.random() * 2 * Math.PI,
+            lastUpdatedTimestep: 0
         };
 
         // Load FBX model
@@ -36,10 +38,29 @@ class Raccoon extends Group {
             gltf.scene.scale.set(0.05, 0.05, 0.05);
             this.add(gltf.scene);
         });
-
+        assignRandomPosition(this.position)
         // Add self to parent's update list
         parent.addToUpdateList(this);
 
+    }
+    updateDirection(direction: number): void {
+        this.state.direction = direction
+    }
+
+    findClosestStudent(): THREE.Group | null {
+        let closestStudent = null;
+        let minDistance = Infinity;
+
+        for (let student of this.parent?.state.students) {
+            let distance = student.position.distanceTo(this.position);
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestStudent = student;
+            }
+        }
+
+        return closestStudent;
     }
 
     update(timeStamp: number): void {
@@ -47,7 +68,18 @@ class Raccoon extends Group {
             if (this.mixer) {
                 this.mixer.update(0.08);
             }
-            this.rotation.y = this.state.direction;
+
+            // update direction based on closest students
+            if (timeStamp - this.state.lastUpdatedTimestep > 1000) {
+                this.state.lastUpdatedTimestep = timeStamp
+                let closestStudent = this.findClosestStudent()
+                if (closestStudent) {
+                    let direction = closestStudent?.position.clone().sub(this.position)
+                    let rotation = Math.atan2(direction.x, direction.z)
+                    this.state.direction = rotation
+                    this.rotation.y = rotation;
+                }
+            }
             const deltaX = Math.sin(this.state.direction) * this.state.speed;
             const deltaZ = Math.cos(this.state.direction) * this.state.speed;
 

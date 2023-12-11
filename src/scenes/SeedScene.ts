@@ -1,23 +1,39 @@
 import dat from 'dat.gui';
 import { Scene, Color } from 'three';
-
-import Flower from '../objects/Flower';
+import * as THREE from 'three';
 import Raccoon from '../objects/Raccoon';
 import Land from '../objects/Land';
 import BasicLights from '../lights/BasicLights';
+import Student from '../objects/Student';
 
 // Define an object type which describes each object in the update list
 type UpdateChild = {
     // Each object *might* contain an update function
     update?: (timeStamp: number) => void;
 };
-const RACCOON_COUNT = 5;
+const RACCOON_COUNT = 3;
+const STUDENT_COUNT = 3
+const MAP_WIDTH = 20
+
+export const getRandomPosition: () => THREE.Vector3 = () => {
+    return new THREE.Vector3(Math.random() * MAP_WIDTH, 0,Math.random() * MAP_WIDTH)
+}
+
+export const assignRandomPosition = (v:THREE.Vector3) => {
+    const position = getRandomPosition()
+    v.x = position.x
+    v.y = position.y
+    v.z = position.z
+}
+
 class SeedScene extends Scene {
     // Define the type of the state field
     state: {
         gui: dat.GUI;
         rotationSpeed: number;
         updateList: UpdateChild[];
+        students: Student[];
+        raccoons: Raccoon[];
     };
 
     constructor() {
@@ -29,6 +45,8 @@ class SeedScene extends Scene {
             gui: new dat.GUI(), // Create GUI for scene
             rotationSpeed: 0,
             updateList: [],
+            students: [],
+            raccoons: [],
         };
 
         // Set background to a nice color
@@ -42,7 +60,16 @@ class SeedScene extends Scene {
 
         // add raccoons
         for (let i = 0; i < RACCOON_COUNT; i++) {
-            this.add(new Raccoon(this));
+            let newRaccoon = new Raccoon(this)
+            this.add(newRaccoon);
+            this.state.raccoons.push(newRaccoon)
+        }
+
+        // add students
+        for (let i = 0; i < STUDENT_COUNT; i++) {
+            let newStudent = new Student(this)
+            this.add(newStudent);
+            this.state.students.push(newStudent)
         }
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
