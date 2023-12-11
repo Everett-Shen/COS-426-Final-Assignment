@@ -1,10 +1,10 @@
 import dat from 'dat.gui';
 import { Scene, Color } from 'three';
 
-import Flower from '../objects/Flower';
 import Raccoon from '../objects/Raccoon';
 import Land from '../objects/Land';
 import BasicLights from '../lights/BasicLights';
+import Car from '../objects/Car'; // Import the Car class
 
 // Define an object type which describes each object in the update list
 type UpdateChild = {
@@ -13,6 +13,7 @@ type UpdateChild = {
 };
 const RACCOON_COUNT = 5;
 class SeedScene extends Scene {
+    private car: Car; //  property for the car
     // Define the type of the state field
     state: {
         gui: dat.GUI;
@@ -36,6 +37,12 @@ class SeedScene extends Scene {
 
         // Add meshes to scene
         const land = new Land();
+
+        // Initialize the car
+        this.car = new Car();
+        this.add(this.car); // Add the car to the scene
+        this.addToUpdateList(this.car); // Add the car to the update list
+
         // const flower = new Flower(this);
         const lights = new BasicLights();
         this.add(lights);
