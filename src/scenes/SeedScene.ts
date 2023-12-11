@@ -1,5 +1,5 @@
+import { Scene, Color, PlaneGeometry, MeshBasicMaterial, Mesh, GridHelper, Fog } from 'three';
 import dat from 'dat.gui';
-import { Scene, Color } from 'three';
 import * as THREE from 'three';
 import Raccoon from '../objects/Raccoon';
 import Land from '../objects/Land';
@@ -7,9 +7,7 @@ import BasicLights from '../lights/BasicLights';
 import Student from '../objects/Student';
 import Car from '../objects/Car'; // Import the Car class
 
-// Define an object type which describes each object in the update list
 type UpdateChild = {
-    // Each object *might* contain an update function
     update?: (timeStamp: number) => void;
 };
 const RACCOON_COUNT = 3;
@@ -28,8 +26,6 @@ export const assignRandomPosition = (v:THREE.Vector3) => {
 }
 
 class SeedScene extends Scene {
-    private car: Car; //  property for the car
-    // Define the type of the state field
     state: {
         gui: dat.GUI;
         rotationSpeed: number;
@@ -39,30 +35,21 @@ class SeedScene extends Scene {
     };
 
     constructor() {
-        // Call parent Scene() constructor
         super();
 
-        // Init state
         this.state = {
-            gui: new dat.GUI(), // Create GUI for scene
+            gui: new dat.GUI(),
             rotationSpeed: 0,
             updateList: [],
             students: [],
             raccoons: [],
         };
 
-        // Set background to a nice color
         this.background = new Color(0x7ec0ee);
 
-        // Add meshes to scene
-        const land = new Land();
+        // Add fog to the scene
+        this.fog = new Fog(0x7ec0ee, 10, 50); // Color, near distance, far distance
 
-        // Initialize the car
-        this.car = new Car();
-        this.add(this.car); // Add the car to the scene
-        this.addToUpdateList(this.car); // Add the car to the update list
-
-        // const flower = new Flower(this);
         const lights = new BasicLights();
         this.add(lights);
 
@@ -81,6 +68,24 @@ class SeedScene extends Scene {
         }
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
+        // Add white plane at (0, 0, 0)
+        const planeGeometry = new PlaneGeometry(100, 100); // Adjust the size as needed
+        const planeMaterial = new MeshBasicMaterial({ color: 0xffffff });
+        const planeMesh = new Mesh(planeGeometry, planeMaterial);
+
+        // Adjust the position and rotation of the plane
+        planeMesh.position.set(0, 0, 0);
+        planeMesh.rotation.x = -Math.PI / 2; // Rotate the plane to be horizontal
+ 
+        this.add(planeMesh);
+
+        const gridSize = 100; // Size of the grid
+        const gridDivisions = 100; // Number of divisions in the grid
+
+        const grid = new GridHelper(gridSize, gridDivisions);
+        grid.position.set(0, 0, 0); // Adjust the position of the grid as needed
+
+        this.add(grid); // Add the grid to the scene
     }
 
     addToUpdateList(object: UpdateChild): void {
@@ -88,10 +93,9 @@ class SeedScene extends Scene {
     }
 
     update(timeStamp: number): void {
-        const { rotationSpeed, updateList } = this.state;
-        this.rotation.y = (rotationSpeed * timeStamp) / 10000;
+        const { updateList } = this.state;
+        // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
 
-        // Call update for each object in the updateList
         for (const obj of updateList) {
             if (obj.update !== undefined) {
                 obj.update(timeStamp);
