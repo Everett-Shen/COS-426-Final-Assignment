@@ -1,7 +1,6 @@
 import { Group } from 'three';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import TWEEN from 'three/examples/jsm/libs/tween.module.js';
 
 import SeedScene from '../scenes/SeedScene';
 
@@ -23,7 +22,6 @@ class Raccoon extends Group {
         this.state = {
             gui: parent.state.gui,
             animate: true,
-            // clock: new THREE.Clock(),
             speed: 0.1,
             direction: Math.random() * 2 * Math.PI,
         };
