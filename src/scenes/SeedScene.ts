@@ -6,6 +6,8 @@ import {
     Mesh,
     GridHelper,
     Fog,
+    Vector3,
+    Euler,
 } from 'three';
 import dat from 'dat.gui';
 import * as THREE from 'three';
@@ -103,6 +105,10 @@ class SeedScene extends Scene {
         grid.position.set(0, 0, 0); // Adjust the position of the grid as needed
 
         this.add(grid); // Add the grid to the scene
+    }
+
+    getCar(): Car {
+        return this.car;
     }
 
     addToUpdateList(object: UpdateChild): void {

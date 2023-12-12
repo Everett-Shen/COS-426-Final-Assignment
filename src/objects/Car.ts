@@ -23,7 +23,7 @@ export default class Car extends Object3D {
         this.deceleration = 0.01;
         this.maxSpeed = 0.5;
         this.rotationSpeed = 0.02;
-        this.inputHandler = new InputHandler(); // Initialize the InputHandler
+        this.inputHandler = new InputHandler();
 
         // Load the model
         const loader = new GLTFLoader();

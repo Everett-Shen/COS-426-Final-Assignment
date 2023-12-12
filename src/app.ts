@@ -7,9 +7,8 @@
  *
  */
 import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-
 import SeedScene from './scenes/SeedScene';
+import { ThirdPersonCamera } from './utils/ThirdPersonCamera';
 
 // Initialize core ThreeJS components
 const scene = new SeedScene();
@@ -31,16 +30,24 @@ document.body.style.overflow = 'hidden'; // Fix scrolling
 document.body.appendChild(canvas);
 
 // Set up controls
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
-controls.enablePan = false;
-controls.minDistance = 4;
-controls.maxDistance = 16;
-controls.update();
+// const controls = new OrbitControls(camera, canvas);
+// controls.enableDamping = true;
+// controls.enablePan = false;
+// controls.minDistance = 4;
+// controls.maxDistance = 16;
+// controls.update();
+
+// Render loop
+const thirdPersonCamera = new ThirdPersonCamera(
+    camera,
+    scene.getCar(),
+    new Vector3(0, 3, 10)
+);
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp: number) => {
-    controls.update();
+    thirdPersonCamera.update(timeStamp); // Update the camera position based on the car.
+
     renderer.render(scene, camera);
     scene.update && scene.update(timeStamp);
     window.requestAnimationFrame(onAnimationFrameHandler);
