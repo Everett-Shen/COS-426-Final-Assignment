@@ -1,8 +1,8 @@
 import { Scene, Color, PlaneGeometry, MeshBasicMaterial, Mesh, GridHelper, Fog } from 'three';
 import dat from 'dat.gui';
+import { Scene, Color } from 'three';
 import * as THREE from 'three';
 import Raccoon from '../objects/Raccoon';
-import Land from '../objects/Land';
 import BasicLights from '../lights/BasicLights';
 import Student from '../objects/Student';
 import Car from '../objects/Car'; // Import the Car class
@@ -45,7 +45,12 @@ class SeedScene extends Scene {
             raccoons: [],
         };
 
-        this.background = new Color(0x7ec0ee);
+        this.background = new Color(0x7ec0ee);        
+
+        // Initialize the car
+        this.car = new Car();
+        this.add(this.car); // Add the car to the scene
+        this.addToUpdateList(this.car); // Add the car to the update list
 
         // Add fog to the scene
         this.fog = new Fog(0x7ec0ee, 10, 50); // Color, near distance, far distance
