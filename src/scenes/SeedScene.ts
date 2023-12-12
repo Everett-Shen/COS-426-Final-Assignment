@@ -37,7 +37,7 @@ export const assignRandomPosition = (v: THREE.Vector3) => {
 };
 
 class SeedScene extends Scene {
-    private car: Car; //  property for the car
+    private car: Car;
     state: {
         gui: dat.GUI;
         rotationSpeed: number;
