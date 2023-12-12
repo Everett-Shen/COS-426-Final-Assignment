@@ -25,7 +25,7 @@ export class ThirdPersonCamera {
     }
 
     private calculateIdealLookat(): Vector3 {
-        // Calculate the ideal look-at position also considering the target's rotation
+        // Calculate the ideal look-at position also considering the target rotation
         const idealLookat = new Vector3(0, 1, -10);
         idealLookat.applyQuaternion(this.target.quaternion);
         idealLookat.add(this.target.position);
