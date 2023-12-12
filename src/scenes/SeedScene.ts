@@ -6,15 +6,13 @@ import {
     Mesh,
     GridHelper,
     Fog,
-    Vector3,
-    Euler,
 } from 'three';
 import dat from 'dat.gui';
 import * as THREE from 'three';
 import Raccoon from '../objects/Raccoon';
 import BasicLights from '../lights/BasicLights';
 import Student from '../objects/Student';
-import Car from '../objects/Car';
+import Car from '../objects/Car'; // Import the Car class
 
 type UpdateChild = {
     update?: (timeStamp: number) => void;
@@ -39,7 +37,8 @@ export const assignRandomPosition = (v: THREE.Vector3) => {
 };
 
 class SeedScene extends Scene {
-    private car: Car;
+    private car: Car; //  property for the car
+
     state: {
         gui: dat.GUI;
         rotationSpeed: number;
@@ -107,14 +106,14 @@ class SeedScene extends Scene {
         this.add(grid); // Add the grid to the scene
     }
 
-    getCar(): Car {
-        return this.car;
-    }
-
     addToUpdateList(object: UpdateChild): void {
         this.state.updateList.push(object);
     }
 
+    // Getter for the car object
+    getCar() {
+        return this.car;
+    }
     update(timeStamp: number): void {
         const { updateList } = this.state;
         // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
