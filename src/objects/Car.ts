@@ -23,12 +23,12 @@ export default class Car extends Object3D {
         this.deceleration = 0.01;
         this.maxSpeed = 0.5;
         this.rotationSpeed = 0.02;
-        this.inputHandler = new InputHandler(); // Initialize the InputHandler
+        this.inputHandler = new InputHandler();
 
         // Load the model
         const loader = new GLTFLoader();
         loader.load(
-            'golf_cart.gltf', // Make sure this path is correct
+            'golf_cart.gltf',
             (gltf) => {
                 console.log('Car model loaded successfully');
                 const model = gltf.scene; // Access the scene from the GLTF

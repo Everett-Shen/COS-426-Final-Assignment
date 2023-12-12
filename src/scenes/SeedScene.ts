@@ -110,6 +110,10 @@ class SeedScene extends Scene {
         this.state.updateList.push(object);
     }
 
+    // Getter for the car object
+    getCar() {
+        return this.car;
+    }
     update(timeStamp: number): void {
         const { updateList } = this.state;
         // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
