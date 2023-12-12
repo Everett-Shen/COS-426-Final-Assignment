@@ -11,14 +11,18 @@ export default class Car extends Object3D {
     private direction: Euler;
     private inputHandler: InputHandler; // An instance of InputHandler
 
+    private isAccelerating: boolean = false;
+    private isDecelerating: boolean = false;
+    private isReversing: boolean = false;
+
     constructor() {
         super();
         this.velocity = new Vector3();
         this.direction = new Euler();
-        this.acceleration = 0.02;
-        this.deceleration = 0.04;
-        this.maxSpeed = 0.2;
-        this.rotationSpeed = 0.03;
+        this.acceleration = 0.01;
+        this.deceleration = 0.01;
+        this.maxSpeed = 0.5;
+        this.rotationSpeed = 0.02;
         this.inputHandler = new InputHandler(); // Initialize the InputHandler
 
         // Load the model
@@ -40,6 +44,10 @@ export default class Car extends Object3D {
     }
 
     public update(timeStamp: number): void {
+        this.isAccelerating = this.inputHandler.isKeyPressed('ArrowUp');
+        this.isDecelerating = this.inputHandler.isKeyPressed('ArrowDown');
+        this.isReversing = this.velocity.z > 0 && this.isDecelerating;
+
         // Handle user input
         if (this.inputHandler.isKeyPressed('ArrowUp')) {
             this.accelerate();
@@ -53,6 +61,7 @@ export default class Car extends Object3D {
         if (this.inputHandler.isKeyPressed('ArrowRight')) {
             this.turnRight();
         }
+        this.applyFriction(); // Apply friction to gradually slow down the car
 
         // Apply velocity and direction to update position and rotation
         this.applyMovement();
@@ -60,39 +69,69 @@ export default class Car extends Object3D {
 
     // Movement methods
     private accelerate(): void {
-        if (this.velocity.length() < this.maxSpeed) {
-            this.velocity.z -= this.acceleration; // assuming the car moves along the z-axis
+        if (this.velocity.z < 0) {
+            this.velocity.z += this.acceleration * 1.5;
+        }
+        // If the car is not already at max speed, increase the speed
+        if (this.velocity.z > -this.maxSpeed) {
+            this.velocity.z += this.acceleration; // Increase speed by reducing the z-value (moving forward)
+            // Clamp the velocity to not exceed the max speed
+            this.velocity.z = Math.max(this.velocity.z, -this.maxSpeed);
         }
     }
     private decelerate(): void {
-        if (this.velocity.length() > 0) {
-            this.velocity.z += this.deceleration;
+        if (this.velocity.z > 0) {
+            this.velocity.z -= this.deceleration * 1.5;
+        }
+        // Check if the car is stationary and should start moving backwards
+        if (this.velocity.z == 0) {
+            this.velocity.z -= this.deceleration; // Start moving backward
+        } else if (this.velocity.z < this.maxSpeed / 2) {
+            // Limit reverse speed to half of max speed
+            this.velocity.z -= this.deceleration; // Continue increasing speed backwards
         }
     }
+
     private turnLeft(): void {
-        this.direction.y += this.rotationSpeed;
-    }
-    private turnRight(): void {
-        this.direction.y -= this.rotationSpeed;
+        // Check the direction of movement to determine turning direction
+        if (this.velocity.z !== 0) {
+            const turnDirection =
+                this.velocity.z > 0 ? this.rotationSpeed : -this.rotationSpeed;
+            this.rotateY(turnDirection);
+        }
     }
 
-    // Apply the movement and rotation based on the velocity and direction
+    private turnRight(): void {
+        // Check the direction of movement to determine turning direction
+        if (this.velocity.z !== 0) {
+            const turnDirection =
+                this.velocity.z > 0 ? -this.rotationSpeed : this.rotationSpeed;
+            this.rotateY(turnDirection);
+        }
+    }
+
+    private applyFriction(): void {
+        if (!this.isAccelerating && !this.isDecelerating) {
+            if (this.velocity.z < 0) {
+                this.velocity.z += this.deceleration;
+            } else if (this.velocity.z > 0) {
+                this.velocity.z -= this.deceleration;
+            }
+        }
+    }
+
+    // Modify the applyMovement method to apply the velocity in the direction the car is facing
     private applyMovement(): void {
         // Update velocity based on acceleration or deceleration
         this.velocity.clampLength(0, this.maxSpeed);
 
-        // Apply friction to slow down the car if not accelerating or decelerating
-        if (Math.abs(this.velocity.z) < this.deceleration) {
-            this.velocity.z = 0;
-        }
+        // Update the velocity vector to be in the direction the car is facing
+        const directionVector = new Vector3(0, 0, this.velocity.z < 0 ? 1 : -1);
+        directionVector.applyQuaternion(this.quaternion);
 
-        // Update the car's position
-        this.position.add(this.velocity);
-
-        // Update the car's rotation
-        this.rotation.copy(this.direction);
-
-        // Reset the direction after applying rotation
-        this.direction.set(0, 0, 0);
+        // Apply the updated velocity vector to the car's position
+        this.position.add(
+            directionVector.multiplyScalar(this.velocity.length())
+        );
     }
 }

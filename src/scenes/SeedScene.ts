@@ -1,8 +1,8 @@
 import dat from 'dat.gui';
 import { Scene, Color } from 'three';
+import * as THREE from 'three';
 
 import Raccoon from '../objects/Raccoon';
-import Land from '../objects/Land';
 import BasicLights from '../lights/BasicLights';
 import Car from '../objects/Car'; // Import the Car class
 
@@ -35,8 +35,24 @@ class SeedScene extends Scene {
         // Set background to a nice color
         this.background = new Color(0x7ec0ee);
 
-        // Add meshes to scene
-        const land = new Land();
+        // // Road (Ground Plane)
+        // const roadGeometry = new THREE.PlaneGeometry(100, 10); // Size of the road
+        // const roadMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 }); // Dark grey
+        // const road = new THREE.Mesh(roadGeometry, roadMaterial);
+        // road.rotation.x = -Math.PI / 2; // Rotate the plane to be flat on the ground
+        // road.position.set(0, 0, 0); // Set position as needed
+        // this.add(road);
+
+        // // Environment (Simple Buildings)
+        // for (let i = 0; i < 10; i++) {
+        //     const buildingGeometry = new THREE.BoxGeometry(5, 10, 5); // Size of the building
+        //     const buildingMaterial = new THREE.MeshLambertMaterial({
+        //         color: 0x808080,
+        //     }); // Building color
+        //     const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
+        //     building.position.set(i * 10 - 50, 5, -10); // Position buildings along one side of the road
+        //     this.add(building);
+        // }
 
         // Initialize the car
         this.car = new Car();
