@@ -1,31 +1,43 @@
-import { Scene, Color, PlaneGeometry, MeshBasicMaterial, Mesh, GridHelper, Fog } from 'three';
+import {
+    Scene,
+    Color,
+    PlaneGeometry,
+    MeshBasicMaterial,
+    Mesh,
+    GridHelper,
+    Fog,
+} from 'three';
 import dat from 'dat.gui';
-import { Scene, Color } from 'three';
 import * as THREE from 'three';
 import Raccoon from '../objects/Raccoon';
 import BasicLights from '../lights/BasicLights';
 import Student from '../objects/Student';
-import Car from '../objects/Car'; // Import the Car class
+import Car from '../objects/Car';
 
 type UpdateChild = {
     update?: (timeStamp: number) => void;
 };
 const RACCOON_COUNT = 3;
-const STUDENT_COUNT = 3
-const MAP_WIDTH = 20
+const STUDENT_COUNT = 3;
+const MAP_WIDTH = 20;
 
 export const getRandomPosition: () => THREE.Vector3 = () => {
-    return new THREE.Vector3(Math.random() * MAP_WIDTH, 0,Math.random() * MAP_WIDTH)
-}
+    return new THREE.Vector3(
+        Math.random() * MAP_WIDTH,
+        0,
+        Math.random() * MAP_WIDTH
+    );
+};
 
-export const assignRandomPosition = (v:THREE.Vector3) => {
-    const position = getRandomPosition()
-    v.x = position.x
-    v.y = position.y
-    v.z = position.z
-}
+export const assignRandomPosition = (v: THREE.Vector3) => {
+    const position = getRandomPosition();
+    v.x = position.x;
+    v.y = position.y;
+    v.z = position.z;
+};
 
 class SeedScene extends Scene {
+    private car: Car; //  property for the car
     state: {
         gui: dat.GUI;
         rotationSpeed: number;
@@ -45,7 +57,7 @@ class SeedScene extends Scene {
             raccoons: [],
         };
 
-        this.background = new Color(0x7ec0ee);        
+        this.background = new Color(0x7ec0ee);
 
         // Initialize the car
         this.car = new Car();
@@ -60,16 +72,16 @@ class SeedScene extends Scene {
 
         // add raccoons
         for (let i = 0; i < RACCOON_COUNT; i++) {
-            let newRaccoon = new Raccoon(this)
+            let newRaccoon = new Raccoon(this);
             this.add(newRaccoon);
-            this.state.raccoons.push(newRaccoon)
+            this.state.raccoons.push(newRaccoon);
         }
 
         // add students
         for (let i = 0; i < STUDENT_COUNT; i++) {
-            let newStudent = new Student(this)
+            let newStudent = new Student(this);
             this.add(newStudent);
-            this.state.students.push(newStudent)
+            this.state.students.push(newStudent);
         }
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
@@ -81,7 +93,7 @@ class SeedScene extends Scene {
         // Adjust the position and rotation of the plane
         planeMesh.position.set(0, 0, 0);
         planeMesh.rotation.x = -Math.PI / 2; // Rotate the plane to be horizontal
- 
+
         this.add(planeMesh);
 
         const gridSize = 100; // Size of the grid
