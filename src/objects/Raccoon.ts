@@ -1,9 +1,8 @@
 import { Group } from 'three';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import TWEEN from 'three/examples/jsm/libs/tween.module.js';
 
-import SeedScene from '../scenes/SeedScene';
+import SeedScene, { assignRandomPosition } from '../scenes/SeedScene';
 
 import MODEL from './animated_raccoon.glb?url';
 
@@ -11,9 +10,10 @@ class Raccoon extends Group {
     state: {
         gui: dat.GUI;
         animate: boolean;
-        clock: THREE.Clock;
+        // clock: THREE.Clock;
         speed: number;
         direction: number;
+        lastUpdatedTimestep: number
     };
     mixer: THREE.AnimationMixer;
     constructor(parent: SeedScene) {
@@ -23,41 +23,63 @@ class Raccoon extends Group {
         this.state = {
             gui: parent.state.gui,
             animate: true,
-            clock: new THREE.Clock(),
             speed: 0.1,
             direction: Math.random() * 2 * Math.PI,
+            lastUpdatedTimestep: 0
         };
 
         // Load FBX model
         const loader = new GLTFLoader();
 
-        this.name = 'myFBXObject';
+        this.name = 'raccoon';
         loader.load(MODEL, (gltf) => {
             this.mixer = new THREE.AnimationMixer(gltf.scene);
             this.mixer.clipAction(gltf.animations[6]).play(); // run
-            // Play all animations
-            // gltf.animations.forEach((clip) => {});
             gltf.scene.scale.set(0.05, 0.05, 0.05);
             this.add(gltf.scene);
         });
-
+        assignRandomPosition(this.position)
         // Add self to parent's update list
         parent.addToUpdateList(this);
 
-        // Populate GUI
-        this.state.gui.add(this.state, 'animate');
+    }
+    updateDirection(direction: number): void {
+        this.state.direction = direction
+    }
+
+    findClosestStudent(): THREE.Group | null {
+        let closestStudent = null;
+        let minDistance = Infinity;
+
+        for (let student of this.parent?.state.students) {
+            let distance = student.position.distanceTo(this.position);
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestStudent = student;
+            }
+        }
+
+        return closestStudent;
     }
 
     update(timeStamp: number): void {
         if (this.state.animate) {
-            // Animation logic here
-            // For example, simple rotation:
-            // this.rotation.y += 0.01;
             if (this.mixer) {
-                this.mixer.update(this.state.clock.getDelta());
+                this.mixer.update(0.08);
             }
-            this.position.z += this.state.speed;
-            this.rotation.y = this.state.direction;
+
+            // update direction based on closest students
+            if (timeStamp - this.state.lastUpdatedTimestep > 1000) {
+                this.state.lastUpdatedTimestep = timeStamp
+                let closestStudent = this.findClosestStudent()
+                if (closestStudent) {
+                    let direction = closestStudent?.position.clone().sub(this.position)
+                    let rotation = Math.atan2(direction.x, direction.z)
+                    this.state.direction = rotation
+                    this.rotation.y = rotation;
+                }
+            }
             const deltaX = Math.sin(this.state.direction) * this.state.speed;
             const deltaZ = Math.cos(this.state.direction) * this.state.speed;
 
@@ -65,8 +87,6 @@ class Raccoon extends Group {
             this.position.z += deltaZ;
         }
 
-        // Advance tween animations, if any exist
-        TWEEN.update();
     }
 }
 

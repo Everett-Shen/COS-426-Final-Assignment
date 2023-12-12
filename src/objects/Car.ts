@@ -28,7 +28,7 @@ export default class Car extends Object3D {
         // Load the model
         const loader = new GLTFLoader();
         loader.load(
-            'golf-cart.gltf', // Make sure this path is correct
+            './/golf-cart.gltf', // Make sure this path is correct
             (gltf) => {
                 console.log('Car model loaded successfully');
                 const model = gltf.scene; // Access the scene from the GLTF
