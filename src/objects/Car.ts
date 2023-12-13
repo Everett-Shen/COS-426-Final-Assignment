@@ -1,6 +1,6 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Object3D, Vector3, Box3 } from 'three';
-import InputHandler from '../utils/InputHandler'; // Import the InputHandler class
+import InputHandler from '../utils/InputHandler';
 
 export default class Car extends Object3D {
     private velocity: Vector3;
