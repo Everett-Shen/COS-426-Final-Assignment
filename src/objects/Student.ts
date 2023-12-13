@@ -2,10 +2,8 @@ import { Group } from 'three';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
-import SeedScene, {
-    assignRandomPosition,
-    getRandomPosition,
-} from '../scenes/SeedScene';
+import SeedScene, { assignRandomPosition } from '../scenes/SeedScene';
+
 
 import MODEL from './bryce.fbx?url';
 
@@ -16,7 +14,7 @@ class Student extends Group {
         speed: number;
         direction: number;
     };
-    mixer: THREE.AnimationMixer;
+    mixer!: THREE.AnimationMixer;
 
     constructor(parent: SeedScene) {
         super();

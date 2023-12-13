@@ -15,7 +15,7 @@ class Raccoon extends Group {
         direction: number;
         lastUpdatedTimestep: number;
     };
-    mixer: THREE.AnimationMixer;
+    mixer!: THREE.AnimationMixer;
     constructor(parent: SeedScene) {
         super();
 
@@ -50,12 +50,17 @@ class Raccoon extends Group {
         let closestStudent = null;
         let minDistance = Infinity;
 
-        for (let student of this.parent?.state.students) {
-            let distance = student.position.distanceTo(this.position);
+        // Use type assertion here
+        if (this.parent instanceof SeedScene) {
+            const parentScene = this.parent as SeedScene;
 
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestStudent = student;
+            for (let student of parentScene.state.students) {
+                let distance = student.position.distanceTo(this.position);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestStudent = student;
+                }
             }
         }
 
