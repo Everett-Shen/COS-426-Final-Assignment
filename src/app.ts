@@ -38,11 +38,7 @@ document.body.appendChild(canvas);
 // controls.update();
 
 // Render loop
-const thirdPersonCamera = new ThirdPersonCamera(
-    camera,
-    scene.getCar(),
-    new Vector3(0, 3, 10)
-);
+const thirdPersonCamera = new ThirdPersonCamera(camera, scene.getCar());
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp: number) => {
