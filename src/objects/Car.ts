@@ -8,17 +8,14 @@ export default class Car extends Object3D {
     private deceleration: number;
     private maxSpeed: number;
     private rotationSpeed: number;
-    private direction: Euler;
     private inputHandler: InputHandler; // An instance of InputHandler
 
     private isAccelerating: boolean = false;
     private isDecelerating: boolean = false;
-    private isReversing: boolean = false;
 
     constructor() {
         super();
         this.velocity = new Vector3();
-        this.direction = new Euler();
         this.acceleration = 0.01;
         this.deceleration = 0.01;
         this.maxSpeed = 0.5;
@@ -43,10 +40,9 @@ export default class Car extends Object3D {
         );
     }
 
-    public update(timeStamp: number): void {
+    public update(): void {
         this.isAccelerating = this.inputHandler.isKeyPressed('ArrowUp');
         this.isDecelerating = this.inputHandler.isKeyPressed('ArrowDown');
-        this.isReversing = this.velocity.z > 0 && this.isDecelerating;
 
         // Handle user input
         if (this.inputHandler.isKeyPressed('ArrowUp')) {

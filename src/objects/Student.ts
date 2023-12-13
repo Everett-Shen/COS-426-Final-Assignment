@@ -2,7 +2,7 @@ import { Group } from 'three';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
-import SeedScene, { assignRandomPosition, getRandomPosition } from '../scenes/SeedScene';
+import SeedScene, { assignRandomPosition } from '../scenes/SeedScene';
 
 import MODEL from './bryce.fbx?url';
 
@@ -13,7 +13,7 @@ class Student extends Group {
         speed: number;
         direction: number;
     };
-    mixer: THREE.AnimationMixer;
+    mixer!: THREE.AnimationMixer;
 
     constructor(parent: SeedScene) {
         super();
@@ -33,12 +33,12 @@ class Student extends Group {
         loader.load(MODEL, (fbx) => {
             this.mixer = new THREE.AnimationMixer(fbx);
 
-            this.mixer.clipAction(fbx.animations[1]).play(); 
+            this.mixer.clipAction(fbx.animations[1]).play();
             fbx.scale.set(0.01, 0.01, 0.01);
             this.add(fbx);
         });
 
-		assignRandomPosition(this.position)
+        assignRandomPosition(this.position);
 
         // Add self to parent's update list
         parent.addToUpdateList(this);

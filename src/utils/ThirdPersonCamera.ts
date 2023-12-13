@@ -1,17 +1,15 @@
-import { Vector3, Camera, Object3D, Quaternion } from 'three';
+import { Vector3, Camera, Object3D } from 'three';
 
 export class ThirdPersonCamera {
     private camera: Camera;
     private target: Object3D;
-    private idealOffset: Vector3;
     private currentOffset: Vector3;
     private currentLookat: Vector3;
     private smoothSpeed: number = 0.1;
 
-    constructor(camera: Camera, target: Object3D, offset: Vector3) {
+    constructor(camera: Camera, target: Object3D) {
         this.camera = camera;
         this.target = target;
-        this.idealOffset = offset;
         this.currentOffset = new Vector3();
         this.currentLookat = new Vector3();
     }
