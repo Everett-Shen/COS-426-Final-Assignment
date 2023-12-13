@@ -14,6 +14,7 @@ class Raccoon extends Group {
         speed: number;
         direction: number;
         lastUpdatedTimestep: number;
+        isDead: boolean;
     };
     mixer!: THREE.AnimationMixer;
     constructor(parent: SeedScene) {
@@ -26,6 +27,7 @@ class Raccoon extends Group {
             speed: 0.08,
             direction: Math.random() * 2 * Math.PI,
             lastUpdatedTimestep: 0,
+            isDead: false,
         };
 
         // Load GLTF model
@@ -67,8 +69,23 @@ class Raccoon extends Group {
         return closestStudent;
     }
 
+    // get the bounding box of the raccoon
+    getBoundingBox(): THREE.Box3 {
+        const boundingBox = new THREE.Box3();
+        boundingBox.setFromObject(this);
+        return boundingBox;
+    }
+
+    handleCollision(): void {
+        // Set the raccoon as dead
+        this.state.isDead = true;
+
+        // Here, you can also trigger any animations or actions for the raccoon
+        // For example, stopping movement, playing a death animation, etc.
+    }
+
     update(timeStamp: number): void {
-        if (this.state.animate) {
+        if (this.state.animate && !this.state.isDead) {
             if (this.mixer) {
                 this.mixer.update(0.04);
             }

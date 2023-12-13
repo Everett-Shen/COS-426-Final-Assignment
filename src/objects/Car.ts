@@ -1,5 +1,5 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { Object3D, Vector3, Euler } from 'three';
+import { Object3D, Vector3, Box3 } from 'three';
 import InputHandler from '../utils/InputHandler'; // Import the InputHandler class
 
 export default class Car extends Object3D {
@@ -90,7 +90,7 @@ export default class Car extends Object3D {
 
     private turnLeft(): void {
         // Check the direction of movement to determine turning direction
-        if (this.velocity.z !== 0) {
+        if (Math.abs(this.velocity.z) > 0.01) {
             const turnDirection =
                 this.velocity.z > 0 ? this.rotationSpeed : -this.rotationSpeed;
             this.rotateY(turnDirection);
@@ -99,7 +99,7 @@ export default class Car extends Object3D {
 
     private turnRight(): void {
         // Check the direction of movement to determine turning direction
-        if (this.velocity.z !== 0) {
+        if (Math.abs(this.velocity.z) > 0.01) {
             const turnDirection =
                 this.velocity.z > 0 ? -this.rotationSpeed : this.rotationSpeed;
             this.rotateY(turnDirection);
@@ -129,5 +129,12 @@ export default class Car extends Object3D {
         this.position.add(
             directionVector.multiplyScalar(this.velocity.length())
         );
+    }
+
+    // get the bounding box of the car
+    getBoundingBox(): Box3 {
+        const boundingBox = new Box3();
+        boundingBox.setFromObject(this);
+        return boundingBox;
     }
 }
