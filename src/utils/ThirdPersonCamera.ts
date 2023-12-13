@@ -30,7 +30,7 @@ export class ThirdPersonCamera {
         return idealLookat;
     }
 
-    public update(timeElapsed: number): void {
+    public update(): void {
         // Calculate the ideal positions
         const idealOffset = this.calculateIdealOffset();
         const idealLookat = this.calculateIdealLookat();
