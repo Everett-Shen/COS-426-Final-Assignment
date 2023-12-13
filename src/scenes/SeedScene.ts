@@ -115,8 +115,14 @@ class SeedScene extends Scene {
         return this.car;
     }
     update(timeStamp: number): void {
-        const { updateList } = this.state;
-        // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
+        const { updateList, raccoons } = this.state;
+        const carBoundingBox = this.car.getBoundingBox(); // Correctly access the car property
+
+        raccoons.forEach((raccoon) => {
+            if (carBoundingBox.intersectsBox(raccoon.getBoundingBox())) {
+                raccoon.handleCollision();
+            }
+        });
 
         for (const obj of updateList) {
             if (obj.update !== undefined) {
