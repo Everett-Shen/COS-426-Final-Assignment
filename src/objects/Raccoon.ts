@@ -81,7 +81,7 @@ class Raccoon extends Group {
         this.state.isDead = true;
 
         // Here, you can also trigger any animations or actions for the raccoon
-        // For example, stopping movement, playing a death animation, etc.
+        // For example, stopping movement, playing a death animation, etc
     }
 
     update(timeStamp: number): void {
