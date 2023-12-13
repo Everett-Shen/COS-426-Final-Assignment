@@ -12,6 +12,7 @@ class Student extends Group {
         animate: boolean;
         speed: number;
         direction: number;
+        isDead: boolean;
     };
     mixer!: THREE.AnimationMixer;
 
@@ -24,6 +25,7 @@ class Student extends Group {
             animate: true,
             speed: 0.02,
             direction: Math.random() * 2 * Math.PI,
+            isDead: false,
         };
 
         // Load FBX model
@@ -44,8 +46,26 @@ class Student extends Group {
         parent.addToUpdateList(this);
     }
 
+    // get the bounding box of the raccoon
+    getBoundingBox(): THREE.Box3 {
+        const boundingBox = new THREE.Box3().setFromObject(this);
+        const size = new THREE.Vector3();
+        boundingBox.getSize(size);
+        size.multiplyScalar(0.9); // Scale down by 20%
+        boundingBox.expandByVector(size.negate().multiplyScalar(0.5));
+        return boundingBox;
+    }
+
+    handleCollision(): void {
+        // Set the raccoon as dead
+        this.state.isDead = true;
+
+        // Here, you can also trigger any animations or actions for the student
+        // For example, stopping movement, playing a death animation, etc
+    }
+
     update(): void {
-        if (this.state.animate) {
+        if (this.state.animate && !this.state.isDead) {
             if (this.mixer) {
                 this.mixer.update(0.02);
             }

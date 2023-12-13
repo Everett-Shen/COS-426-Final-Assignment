@@ -115,12 +115,18 @@ class SeedScene extends Scene {
         return this.car;
     }
     update(timeStamp: number): void {
-        const { updateList, raccoons } = this.state;
+        const { updateList, raccoons, students } = this.state;
         const carBoundingBox = this.car.getBoundingBox(); // Correctly access the car property
 
         raccoons.forEach((raccoon) => {
             if (carBoundingBox.intersectsBox(raccoon.getBoundingBox())) {
                 raccoon.handleCollision();
+            }
+        });
+
+        students.forEach((student) => {
+            if (carBoundingBox.intersectsBox(student.getBoundingBox())) {
+                student.handleCollision();
             }
         });
 
