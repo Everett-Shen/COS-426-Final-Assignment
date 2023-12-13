@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import SeedScene, { assignRandomPosition } from '../scenes/SeedScene';
 
-import MODEL from './animated_raccoon.glb?url';
+import MODEL from './Raccoon.glb?url';
 
 class Raccoon extends Group {
     state: {
@@ -23,12 +23,12 @@ class Raccoon extends Group {
         this.state = {
             gui: parent.state.gui,
             animate: true,
-            speed: 0.1,
+            speed: 0.08,
             direction: Math.random() * 2 * Math.PI,
             lastUpdatedTimestep: 0,
         };
 
-        // Load FBX model
+        // Load GLTF model
         const loader = new GLTFLoader();
 
         this.name = 'raccoon';
@@ -70,7 +70,7 @@ class Raccoon extends Group {
     update(timeStamp: number): void {
         if (this.state.animate) {
             if (this.mixer) {
-                this.mixer.update(0.08);
+                this.mixer.update(0.04);
             }
 
             // update direction based on closest students

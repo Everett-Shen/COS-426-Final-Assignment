@@ -4,6 +4,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
 import SeedScene, { assignRandomPosition } from '../scenes/SeedScene';
 
+
 import MODEL from './bryce.fbx?url';
 
 class Student extends Group {
@@ -22,7 +23,7 @@ class Student extends Group {
         this.state = {
             gui: parent.state.gui,
             animate: true,
-            speed: 0.03,
+            speed: 0.02,
             direction: Math.random() * 2 * Math.PI,
         };
 
@@ -47,7 +48,7 @@ class Student extends Group {
     update(timeStamp: number): void {
         if (this.state.animate) {
             if (this.mixer) {
-                this.mixer.update(0.03);
+                this.mixer.update(0.02);
             }
             this.rotation.y = this.state.direction;
             const deltaX = Math.sin(this.state.direction) * this.state.speed;
