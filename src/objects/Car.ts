@@ -8,7 +8,7 @@ export default class Car extends Object3D {
     private deceleration: number;
     private maxSpeed: number;
     private rotationSpeed: number;
-    private inputHandler: InputHandler; // an instance of InputHandler
+    private inputHandler: InputHandler; // An instance of InputHandler
 
     private isAccelerating: boolean = false;
     private isDecelerating: boolean = false;
