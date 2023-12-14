@@ -1,6 +1,6 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { Object3D, Vector3, Euler } from 'three';
-import InputHandler from '../utils/InputHandler'; // Import the InputHandler class
+import { Object3D, Vector3, Box3 } from 'three';
+import InputHandler from '../utils/InputHandler';
 
 export default class Car extends Object3D {
     private velocity: Vector3;
@@ -8,27 +8,24 @@ export default class Car extends Object3D {
     private deceleration: number;
     private maxSpeed: number;
     private rotationSpeed: number;
-    private direction: Euler;
     private inputHandler: InputHandler; // An instance of InputHandler
 
     private isAccelerating: boolean = false;
     private isDecelerating: boolean = false;
-    private isReversing: boolean = false;
 
     constructor() {
         super();
         this.velocity = new Vector3();
-        this.direction = new Euler();
         this.acceleration = 0.01;
         this.deceleration = 0.01;
-        this.maxSpeed = 0.5;
+        this.maxSpeed = 1;
         this.rotationSpeed = 0.02;
-        this.inputHandler = new InputHandler(); // Initialize the InputHandler
+        this.inputHandler = new InputHandler();
 
         // Load the model
         const loader = new GLTFLoader();
         loader.load(
-            'golf_cart.gltf', // Make sure this path is correct
+            'golf_cart.gltf',
             (gltf) => {
                 console.log('Car model loaded successfully');
                 const model = gltf.scene; // Access the scene from the GLTF
@@ -43,10 +40,9 @@ export default class Car extends Object3D {
         );
     }
 
-    public update(timeStamp: number): void {
+    public update(): void {
         this.isAccelerating = this.inputHandler.isKeyPressed('ArrowUp');
         this.isDecelerating = this.inputHandler.isKeyPressed('ArrowDown');
-        this.isReversing = this.velocity.z > 0 && this.isDecelerating;
 
         // Handle user input
         if (this.inputHandler.isKeyPressed('ArrowUp')) {
@@ -94,7 +90,7 @@ export default class Car extends Object3D {
 
     private turnLeft(): void {
         // Check the direction of movement to determine turning direction
-        if (this.velocity.z !== 0) {
+        if (Math.abs(this.velocity.z) > 0.01) {
             const turnDirection =
                 this.velocity.z > 0 ? this.rotationSpeed : -this.rotationSpeed;
             this.rotateY(turnDirection);
@@ -103,7 +99,7 @@ export default class Car extends Object3D {
 
     private turnRight(): void {
         // Check the direction of movement to determine turning direction
-        if (this.velocity.z !== 0) {
+        if (Math.abs(this.velocity.z) > 0.01) {
             const turnDirection =
                 this.velocity.z > 0 ? -this.rotationSpeed : this.rotationSpeed;
             this.rotateY(turnDirection);
@@ -133,5 +129,16 @@ export default class Car extends Object3D {
         this.position.add(
             directionVector.multiplyScalar(this.velocity.length())
         );
+    }
+
+    // get the bounding box of the car
+    getBoundingBox(): Box3 {
+        const boundingBox = new Box3();
+        boundingBox.setFromObject(this);
+        return boundingBox;
+    }
+
+    setVelocityZero(): void {
+        this.velocity = new Vector3();
     }
 }

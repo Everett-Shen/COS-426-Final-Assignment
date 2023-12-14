@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import SeedScene, { assignRandomPosition } from '../scenes/SeedScene';
 
-import MODEL from './animated_raccoon.glb?url';
+import MODEL from './Raccoon.glb?url';
 
 class Raccoon extends Group {
     state: {
@@ -13,9 +13,10 @@ class Raccoon extends Group {
         // clock: THREE.Clock;
         speed: number;
         direction: number;
-        lastUpdatedTimestep: number
+        lastUpdatedTimestep: number;
+        isDead: boolean;
     };
-    mixer: THREE.AnimationMixer;
+    mixer!: THREE.AnimationMixer;
     constructor(parent: SeedScene) {
         super();
 
@@ -23,12 +24,13 @@ class Raccoon extends Group {
         this.state = {
             gui: parent.state.gui,
             animate: true,
-            speed: 0.1,
+            speed: 0.08,
             direction: Math.random() * 2 * Math.PI,
-            lastUpdatedTimestep: 0
+            lastUpdatedTimestep: 0,
+            isDead: false,
         };
 
-        // Load FBX model
+        // Load GLTF model
         const loader = new GLTFLoader();
 
         this.name = 'raccoon';
@@ -38,45 +40,66 @@ class Raccoon extends Group {
             gltf.scene.scale.set(0.05, 0.05, 0.05);
             this.add(gltf.scene);
         });
-        assignRandomPosition(this.position)
+        assignRandomPosition(this.position);
         // Add self to parent's update list
         parent.addToUpdateList(this);
-
     }
     updateDirection(direction: number): void {
-        this.state.direction = direction
+        this.state.direction = direction;
     }
 
     findClosestStudent(): THREE.Group | null {
         let closestStudent = null;
         let minDistance = Infinity;
 
-        for (let student of this.parent?.state.students) {
-            let distance = student.position.distanceTo(this.position);
+        // Use type assertion here
+        if (this.parent instanceof SeedScene) {
+            const parentScene = this.parent as SeedScene;
 
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestStudent = student;
+            for (let student of parentScene.state.students) {
+                let distance = student.position.distanceTo(this.position);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestStudent = student;
+                }
             }
         }
 
         return closestStudent;
     }
 
+    // get the bounding box of the raccoon
+    getBoundingBox(): THREE.Box3 {
+        const boundingBox = new THREE.Box3();
+        boundingBox.setFromObject(this);
+        return boundingBox;
+    }
+
+    handleCollision(): void {
+        // Set the raccoon as dead
+        this.state.isDead = true;
+
+        // Here, you can also trigger any animations or actions for the raccoon
+        // For example, stopping movement, playing a death animation, etc
+    }
+
     update(timeStamp: number): void {
-        if (this.state.animate) {
+        if (this.state.animate && !this.state.isDead) {
             if (this.mixer) {
-                this.mixer.update(0.08);
+                this.mixer.update(0.04);
             }
 
             // update direction based on closest students
             if (timeStamp - this.state.lastUpdatedTimestep > 1000) {
-                this.state.lastUpdatedTimestep = timeStamp
-                let closestStudent = this.findClosestStudent()
+                this.state.lastUpdatedTimestep = timeStamp;
+                let closestStudent = this.findClosestStudent();
                 if (closestStudent) {
-                    let direction = closestStudent?.position.clone().sub(this.position)
-                    let rotation = Math.atan2(direction.x, direction.z)
-                    this.state.direction = rotation
+                    let direction = closestStudent?.position
+                        .clone()
+                        .sub(this.position);
+                    let rotation = Math.atan2(direction.x, direction.z);
+                    this.state.direction = rotation;
                     this.rotation.y = rotation;
                 }
             }
@@ -86,7 +109,6 @@ class Raccoon extends Group {
             this.position.x += deltaX;
             this.position.z += deltaZ;
         }
-
     }
 }
 

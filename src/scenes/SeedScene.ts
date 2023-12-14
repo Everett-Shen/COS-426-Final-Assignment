@@ -1,18 +1,18 @@
 import {
     Scene,
     Color,
-    PlaneGeometry,
-    MeshBasicMaterial,
-    Mesh,
-    GridHelper,
     Fog,
+    MeshBasicMaterial,
+    Mesh
 } from 'three';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import dat from 'dat.gui';
 import * as THREE from 'three';
 import Raccoon from '../objects/Raccoon';
 import BasicLights from '../lights/BasicLights';
 import Student from '../objects/Student';
 import Car from '../objects/Car'; // Import the Car class
+import School from '../objects/School';
 
 type UpdateChild = {
     update?: (timeStamp: number) => void;
@@ -38,6 +38,8 @@ export const assignRandomPosition = (v: THREE.Vector3) => {
 
 class SeedScene extends Scene {
     private car: Car; //  property for the car
+    private school: School; // property for the school
+    private pointsText: Mesh;
 
     state: {
         gui: dat.GUI;
@@ -45,6 +47,7 @@ class SeedScene extends Scene {
         updateList: UpdateChild[];
         students: Student[];
         raccoons: Raccoon[];
+        points: number
     };
 
     constructor() {
@@ -56,6 +59,7 @@ class SeedScene extends Scene {
             updateList: [],
             students: [],
             raccoons: [],
+            points: 0,
         };
 
         this.background = new Color(0x7ec0ee);
@@ -65,8 +69,12 @@ class SeedScene extends Scene {
         this.add(this.car); // Add the car to the scene
         this.addToUpdateList(this.car); // Add the car to the update list
 
+        // initialize the school
+        this.school = new School();
+        this.add(this.school);
+
         // Add fog to the scene
-        this.fog = new Fog(0x7ec0ee, 10, 50); // Color, near distance, far distance
+        this.fog = new Fog(0x7ec0ee, 100, 500); // Color, near distance, far distance
 
         const lights = new BasicLights();
         this.add(lights);
@@ -84,35 +92,60 @@ class SeedScene extends Scene {
             this.add(newStudent);
             this.state.students.push(newStudent);
         }
-        // Populate GUI
-        this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
-        // Add white plane at (0, 0, 0)
-        const planeGeometry = new PlaneGeometry(100, 100); // Adjust the size as needed
-        const planeMaterial = new MeshBasicMaterial({ color: 0xffffff });
-        const planeMesh = new Mesh(planeGeometry, planeMaterial);
-
-        // Adjust the position and rotation of the plane
-        planeMesh.position.set(0, 0, 0);
-        planeMesh.rotation.x = -Math.PI / 2; // Rotate the plane to be horizontal
-
-        this.add(planeMesh);
-
-        const gridSize = 100; // Size of the grid
-        const gridDivisions = 100; // Number of divisions in the grid
-
-        const grid = new GridHelper(gridSize, gridDivisions);
-        grid.position.set(0, 0, 0); // Adjust the position of the grid as needed
-
-        this.add(grid); // Add the grid to the scene
     }
 
     addToUpdateList(object: UpdateChild): void {
         this.state.updateList.push(object);
     }
 
+    // Getter for the car object
+    getCar() {
+        return this.car;
+    }
+
     update(timeStamp: number): void {
-        const { updateList } = this.state;
-        // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
+        const { updateList, raccoons, students } = this.state;
+        const carBoundingBox = this.car.getBoundingBox(); // Correctly access the car property
+        const schoolBoundingBox = this.school.getBoundingBox()
+
+        raccoons.forEach((raccoon) => {
+            if (carBoundingBox.intersectsBox(raccoon.getBoundingBox())) {
+                raccoon.handleCollision();
+                this.state.points += 1;
+                console.log(this.state.points);
+            }
+        });
+
+        students.forEach((student) => {
+            if (carBoundingBox.intersectsBox(student.getBoundingBox())) {
+                student.handleCollision();
+                this.state.points -= 1;
+            }
+        });
+
+        if (!carBoundingBox.intersectsBox(schoolBoundingBox)) {
+            // Calculate the distance between the car and the box
+            let distanceX = 0;
+            let distanceY = 0;
+
+            if (carBoundingBox.min.x < schoolBoundingBox.min.x + 10) {
+                distanceX = carBoundingBox.min.x - schoolBoundingBox.min.x;
+            } else if (carBoundingBox.max.x > schoolBoundingBox.max.x - 10) {
+                distanceX = carBoundingBox.max.x - schoolBoundingBox.max.x;
+            }
+
+            if (carBoundingBox.min.y < schoolBoundingBox.min.y + 10) {
+                distanceY = carBoundingBox.min.y - schoolBoundingBox.min.y;
+            } else if (carBoundingBox.max.y > schoolBoundingBox.max.y - 10) {
+                distanceY = carBoundingBox.max.y - schoolBoundingBox.max.y;
+            }
+
+            // Move the car back by the calculated distances
+            this.car.position.x -= distanceX;
+            this.car.position.y -= distanceY;
+
+            this.car.setVelocityZero();
+        }
 
         for (const obj of updateList) {
             if (obj.update !== undefined) {
