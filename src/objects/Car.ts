@@ -9,7 +9,7 @@ export default class Car extends Object3D {
     private maxSpeed: number;
     private rotationSpeed: number;
     private inputHandler: InputHandler; // An instance of InputHandler
-    private raccoonScore: number;
+    public raccoonScore: number;
     private studentScore: number;
 
     private isAccelerating: boolean = false;
@@ -67,6 +67,14 @@ export default class Car extends Object3D {
         this.applyMovement();
     }
 
+    // Check if the game should end and trigger game over
+    public checkGameOver(): void {
+        if (this.studentScore >= 3) {
+            // Trigger game over event or call a callback
+            document.dispatchEvent(new Event('gameOver'));
+        }
+    }
+
     // Methods to increment score
     public incrementRaccoonScore(): void {
         this.raccoonScore++;
@@ -76,6 +84,7 @@ export default class Car extends Object3D {
     public incrementStudentScore(): void {
         this.studentScore++;
         this.updateStudentScoreDisplay();
+        this.checkGameOver();
     }
 
     // Method to update the score display

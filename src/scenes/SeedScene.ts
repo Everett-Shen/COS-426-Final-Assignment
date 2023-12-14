@@ -13,10 +13,12 @@ type UpdateChild = {
 const RACCOON_COUNT = 10;
 const STUDENT_COUNT = 10;
 const MAP_WIDTH = 500;
+const SPAWN_DIST = 50;
 
 class SeedScene extends Scene {
     private car: Car; //  property for the car
     private school: School; // property for the school
+    private paused: boolean = false; // Pause flag
 
     state: {
         gui: dat.GUI;
@@ -95,7 +97,7 @@ class SeedScene extends Scene {
             let newStudent = new Student(this);
             let randomPosition = this.getRandomPosition(
                 [...this.state.students, ...this.state.raccoons],
-                10
+                SPAWN_DIST
             );
             newStudent.position.copy(randomPosition);
             this.add(newStudent);
@@ -125,6 +127,11 @@ class SeedScene extends Scene {
     }
 
     update(timeStamp: number): void {
+        // Check if the game is paused
+        if (this.paused) {
+            return; // Skip the update loop
+        }
+
         const { updateList, raccoons, students } = this.state;
         const carBoundingBox = this.car.getBoundingBox(); // Correctly access the car property
         const schoolBoundingBox = this.school.getBoundingBox();
