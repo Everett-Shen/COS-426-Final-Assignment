@@ -1,6 +1,6 @@
 import { Group } from 'three';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import SeedScene, { assignRandomPosition } from '../scenes/SeedScene';
 
@@ -17,6 +17,7 @@ class Raccoon extends Group {
         isDead: boolean;
     };
     mixer!: THREE.AnimationMixer;
+    gltfModel: GLTF;
     constructor(parent: SeedScene) {
         super();
 
@@ -35,6 +36,7 @@ class Raccoon extends Group {
 
         this.name = 'raccoon';
         loader.load(MODEL, (gltf) => {
+            this.gltfModel = gltf;
             this.mixer = new THREE.AnimationMixer(gltf.scene);
             this.mixer.clipAction(gltf.animations[6]).play(); // run
             gltf.scene.scale.set(0.05, 0.05, 0.05);
@@ -75,13 +77,33 @@ class Raccoon extends Group {
         boundingBox.setFromObject(this);
         return boundingBox;
     }
+    playDeathAnimation = () => {
+        // TODO: play sound effect
+
+        // Stop the current animation (running)
+        if (this.mixer) {
+            const currentAction = this.mixer.clipAction(
+                this.gltfModel.animations[6]
+            );
+            currentAction.stop();
+        }
+
+        // Start the new animation (e.g., death animation)
+        if (this.mixer && this.gltfModel.animations[0]) {
+            const newAction = this.mixer.clipAction(
+                this.gltfModel.animations[0]
+            );
+            newAction.play();
+        }
+        if (this.mixer) {
+            this.mixer.update(0.04);
+        }
+    };
 
     handleCollision(): void {
         // Set the raccoon as dead
         this.state.isDead = true;
-
-        // Here, you can also trigger any animations or actions for the raccoon
-        // For example, stopping movement, playing a death animation, etc
+        this.playDeathAnimation();
     }
 
     update(timeStamp: number): void {

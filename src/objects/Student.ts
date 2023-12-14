@@ -1,10 +1,12 @@
 import { Group } from 'three';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import SeedScene, { assignRandomPosition } from '../scenes/SeedScene';
 
-import MODEL from './bryce.fbx?url';
+import MODEL from './test.glb?url';
+import DYING_MODEL from './remy_dying.fbx?url';
 
 class Student extends Group {
     state: {
@@ -15,6 +17,7 @@ class Student extends Group {
         isDead: boolean;
     };
     mixer!: THREE.AnimationMixer;
+    gltfModel: GLTF;
 
     constructor(parent: SeedScene) {
         super();
@@ -28,16 +31,16 @@ class Student extends Group {
             isDead: false,
         };
 
-        // Load FBX model
-        const loader = new FBXLoader();
+        const loader = new GLTFLoader();
 
         this.name = 'student';
-        loader.load(MODEL, (fbx) => {
-            this.mixer = new THREE.AnimationMixer(fbx);
+        loader.load(MODEL, (gltf) => {
+            this.gltfModel = gltf;
+            this.mixer = new THREE.AnimationMixer(gltf.scene);
 
-            this.mixer.clipAction(fbx.animations[1]).play();
-            fbx.scale.set(0.01, 0.01, 0.01);
-            this.add(fbx);
+            this.mixer.clipAction(gltf.animations[1]).play();
+            gltf.scene.scale.set(1.5, 1.5, 1.5);
+            this.add(gltf.scene);
         });
 
         assignRandomPosition(this.position);
@@ -48,18 +51,36 @@ class Student extends Group {
 
     // get the bounding box of the raccoon
     getBoundingBox(): THREE.Box3 {
-        const boundingBox = new THREE.Box3().setFromObject(this);
-        const size = new THREE.Vector3();
-        boundingBox.getSize(size);
-        size.multiplyScalar(0.9); // Scale down by 20%
-        boundingBox.expandByVector(size.negate().multiplyScalar(0.5));
+        const boundingBox = new THREE.Box3();
+        boundingBox.setFromObject(this);
         return boundingBox;
     }
 
+    playDeathAnimation = () => {
+        // TODO: play sound effect
+
+        // Stop the current animation (running)
+        if (this.mixer) {
+            const currentAction = this.mixer.clipAction(
+                this.gltfModel.animations[1]
+            );
+            currentAction.stop();
+        }
+
+        if (this.mixer && this.gltfModel.animations[0]) {
+            const newAction = this.mixer.clipAction(
+                this.gltfModel.animations[0]
+            );
+            newAction.play();
+        }
+        if (this.mixer) {
+            this.mixer.update(0.1);
+        }
+    };
     handleCollision(): void {
         // Set the raccoon as dead
         this.state.isDead = true;
-
+        this.playDeathAnimation();
         // Here, you can also trigger any animations or actions for the student
         // For example, stopping movement, playing a death animation, etc
     }
