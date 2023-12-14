@@ -23,7 +23,6 @@ export default class School extends Object3D {
                 console.error('Error loading school model:', error);
             }
         );
-        // this.position.copy(new THREE.Vector3(0, 0, 0));
     }
 
     // get the bounding box of the school

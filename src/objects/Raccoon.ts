@@ -54,6 +54,13 @@ class Raccoon extends Group {
     updateDirection(direction: number): void {
         this.state.direction = direction;
     }
+    removeSelf(): void {
+        if (this.parent.state.raccoons) {
+            this.parent.state.raccoons = this.parent.state.raccoons.filter(
+                (raccoon) => raccoon !== this
+            );
+        }
+    }
 
     findClosestStudent(): Student | null {
         let closestStudent = null;
@@ -103,6 +110,7 @@ class Raccoon extends Group {
         if (this.mixer) {
             this.mixer.update(0.04);
         }
+        this.parent.playDeathSound(this.position, true);
     };
 
     handleCollision(): void {
@@ -113,6 +121,7 @@ class Raccoon extends Group {
 
         this.state.isDead = true;
         this.playDeathAnimation();
+        this.removeSelf();
     }
 
     update(timeStamp: number): void {

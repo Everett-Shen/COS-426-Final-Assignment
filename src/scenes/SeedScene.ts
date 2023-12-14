@@ -1,4 +1,4 @@
-import { Scene, Color, Fog, MeshBasicMaterial, Mesh } from 'three';
+import { Scene, Color, Fog, AudioListener, Audio, AudioLoader } from 'three';
 import dat from 'dat.gui';
 import * as THREE from 'three';
 import Raccoon from '../objects/Raccoon';
@@ -26,6 +26,11 @@ class SeedScene extends Scene {
         raccoons: Raccoon[];
         points: number;
     };
+    listener: AudioListener;
+    deathSound!: Audio;
+    raccoonDeathSound!: Audio;
+    squishSound!: Audio;
+    music!: Audio;
 
     getRandomPosition(
         existingObjects: { position: THREE.Vector3 }[],
@@ -59,6 +64,7 @@ class SeedScene extends Scene {
             raccoons: [],
             points: 0,
         };
+        this.listener = new AudioListener();
 
         this.background = new Color(0x7ec0ee);
 
@@ -100,6 +106,53 @@ class SeedScene extends Scene {
             newStudent.position.copy(randomPosition);
             this.add(newStudent);
             this.state.students.push(newStudent);
+        }
+
+        // Load and play the death sound
+        const audioLoader = new AudioLoader();
+        this.deathSound = new Audio(this.listener);
+        audioLoader.load('src/sounds/death.mp3', (buffer) => {
+            this.deathSound.setBuffer(buffer);
+        });
+
+        // raccoon death sound
+        this.raccoonDeathSound = new Audio(this.listener);
+        audioLoader.load('src/sounds/raccoonDeath.mp3', (buffer) => {
+            this.raccoonDeathSound.setBuffer(buffer);
+        });
+
+        // squish sound
+        this.squishSound = new Audio(this.listener);
+        audioLoader.load('src/sounds/squish.mp3', (buffer) => {
+            this.squishSound.setBuffer(buffer);
+        });
+
+        // load music
+        this.music = new Audio(this.listener);
+        audioLoader.load('src/sounds/music.mp3', (buffer) => {
+            this.music.setBuffer(buffer);
+            this.music.setLoop(true);
+            this.music.play();
+        });
+    }
+
+    playDeathSound(position: THREE.Vector3, raccoon = false) {
+        let distance = this.car.position.distanceTo(position);
+
+        if (raccoon) {
+            this.raccoonDeathSound.setVolume(
+                Math.max(0.1 / (distance / MAP_WIDTH), 1)
+            );
+            this.squishSound.setVolume(
+                Math.max(0.1 / (distance / MAP_WIDTH), 1)
+            );
+            this.raccoonDeathSound.play();
+            this.squishSound.play();
+        } else {
+            this.deathSound.setVolume(
+                Math.max(0.05 / (distance / MAP_WIDTH), 0.2)
+            );
+            this.deathSound.play();
         }
     }
 
