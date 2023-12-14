@@ -5,8 +5,32 @@
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>COS 426 Final Project</title>
+        <style>
+            #score {
+                position: fixed;
+                top: 30px;
+                left: 30px;
+                font-size: 50px;
+                color: white;
+                background: rgba(0, 0, 0, 0.5);
+                padding: 5px;
+                border-radius: 5px;
+            }
+            #dead {
+                position: fixed;
+                top: 100px;
+                left: 30px;
+                font-size: 30px;
+                color: white;
+                background: rgba(0, 0, 0, 0.5);
+                padding: 5px;
+                border-radius: 5px;
+            }
+        </style>
     </head>
     <body>
+        <div id="score">Score: 0</div>
+        <div id="dead">Dead Students: 0</div>
         <script type="module" src="/src/app.ts"></script>
     </body>
 </html>

@@ -1,8 +1,8 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Object3D, Box3 } from 'three';
+import * as THREE from 'three';
 
 export default class School extends Object3D {
-
     constructor() {
         super();
 
@@ -18,6 +18,7 @@ export default class School extends Object3D {
                 model.position.y += 3;
                 model.rotation.y = Math.PI; // Adjust rotation as needed
                 this.add(model); // Add the model to the School object
+                this.toJSON;
             },
             undefined,
             (error) => {

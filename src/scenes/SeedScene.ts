@@ -1,11 +1,4 @@
-import {
-    Scene,
-    Color,
-    Fog,
-    MeshBasicMaterial,
-    Mesh
-} from 'three';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { Scene, Color, Fog, AudioListener, Audio, AudioLoader } from 'three';
 import dat from 'dat.gui';
 import * as THREE from 'three';
 import Raccoon from '../objects/Raccoon';
@@ -18,9 +11,9 @@ import School from '../objects/School';
 type UpdateChild = {
     update?: (timeStamp: number) => void;
 };
-const RACCOON_COUNT = 3;
-const STUDENT_COUNT = 3;
-const MAP_WIDTH = 70;
+const RACCOON_COUNT = 10;
+const STUDENT_COUNT = 10;
+const MAP_WIDTH = 125;
 
 class SeedScene extends Scene {
     private car: Car; //  property for the car
@@ -33,8 +26,13 @@ class SeedScene extends Scene {
         updateList: UpdateChild[];
         students: Student[];
         raccoons: Raccoon[];
-        points: number
+        points: number;
     };
+    listener: AudioListener;
+    deathSound!: Audio;
+    raccoonDeathSound!: Audio;
+    squishSound!: Audio;
+    music!: Audio;
 
     getRandomPosition(
         existingObjects: { position: THREE.Vector3 }[],
@@ -44,17 +42,15 @@ class SeedScene extends Scene {
         let tooClose;
         do {
             position = new THREE.Vector3(
-                Math.random() * MAP_WIDTH,
+                Math.random() * MAP_WIDTH - MAP_WIDTH / 2,
                 0, // Assuming y is up and you want to spawn objects on the ground
-                Math.random() * MAP_WIDTH
+                Math.random() * MAP_WIDTH - MAP_WIDTH / 2
             );
 
             tooClose = existingObjects.some(
                 (obj) => obj.position.distanceTo(position) < minDistance
             );
         } while (tooClose);
-
-        console.log(position);
 
         return position;
     }
@@ -70,6 +66,7 @@ class SeedScene extends Scene {
             raccoons: [],
             points: 0,
         };
+        this.listener = new AudioListener();
 
         this.background = new Color(0x7ec0ee);
 
@@ -99,9 +96,10 @@ class SeedScene extends Scene {
             let newRaccoon = new Raccoon(this);
             let randomPosition = this.getRandomPosition(
                 this.state.students,
-                30
+                MAP_WIDTH * 0.1
             ); // 10 is the minimum distance
             newRaccoon.position.copy(randomPosition);
+            newRaccoon.position.y = 10;
             this.add(newRaccoon);
             this.state.raccoons.push(newRaccoon);
         }
@@ -111,12 +109,65 @@ class SeedScene extends Scene {
             let newStudent = new Student(this);
             let randomPosition = this.getRandomPosition(
                 [...this.state.students, ...this.state.raccoons],
-                30
+                10
             );
             newStudent.position.copy(randomPosition);
             this.add(newStudent);
             this.state.students.push(newStudent);
         }
+
+        // Load and play the death sound
+        const audioLoader = new AudioLoader();
+        this.deathSound = new Audio(this.listener);
+        audioLoader.load('src/sounds/death.mp3', (buffer) => {
+            this.deathSound.setBuffer(buffer);
+        });
+
+        // raccoon death sound
+        this.raccoonDeathSound = new Audio(this.listener);
+        audioLoader.load('src/sounds/raccoonDeath.mp3', (buffer) => {
+            this.raccoonDeathSound.setBuffer(buffer);
+        });
+
+        // squish sound
+        this.squishSound = new Audio(this.listener);
+        audioLoader.load('src/sounds/squish.mp3', (buffer) => {
+            this.squishSound.setBuffer(buffer);
+        });
+
+        // load music
+        this.music = new Audio(this.listener);
+        audioLoader.load('src/sounds/music.mp3', (buffer) => {
+            this.music.setBuffer(buffer);
+            this.music.setLoop(true);
+            this.music.play();
+        });
+    }
+
+    playDeathSound(position: THREE.Vector3, raccoon = false) {
+        let distance = this.car.position.distanceTo(position);
+
+        if (raccoon) {
+            this.raccoonDeathSound.setVolume(
+                Math.max(0.1 / (distance / MAP_WIDTH), 1)
+            );
+            this.squishSound.setVolume(
+                Math.max(0.1 / (distance / MAP_WIDTH), 1)
+            );
+            this.raccoonDeathSound.play();
+            this.squishSound.play();
+        } else {
+            this.deathSound.setVolume(
+                Math.max(0.03 / (distance / MAP_WIDTH), 0.2)
+            );
+            this.deathSound.play();
+        }
+        // Listen for student killed event
+        // document.addEventListener('studentKilled', (event: Event) => {
+        //     // Use type assertion if needed to access the detail property
+        //     // const customEvent = event as CustomEvent;
+        //     this.car.incrementStudentScore();
+        // });
     }
 
     addToUpdateList(object: UpdateChild): void {
@@ -134,13 +185,20 @@ class SeedScene extends Scene {
         const grassBoundingBox = this.grass.getBoundingBox()
 
         raccoons.forEach((raccoon) => {
-            if (carBoundingBox.intersectsBox(raccoon.getBoundingBox())) {
+            if (
+                !raccoon.state.isDead &&
+                carBoundingBox.intersectsBox(raccoon.getBoundingBox())
+            ) {
                 raccoon.handleCollision();
+                this.car.incrementRaccoonScore();
             }
         });
 
         students.forEach((student) => {
-            if (carBoundingBox.intersectsBox(student.getBoundingBox())) {
+            if (
+                !student.state.isDead &&
+                carBoundingBox.intersectsBox(student.getBoundingBox())
+            ) {
                 student.handleCollision();
             }
         });

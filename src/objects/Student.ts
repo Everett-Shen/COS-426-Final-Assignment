@@ -1,10 +1,10 @@
-import { Group } from 'three';
+import { Group, Audio } from 'three';
 import * as THREE from 'three';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import SeedScene from '../scenes/SeedScene';
 
-import MODEL from './bryce.fbx?url';
+import MODEL from './test.glb?url';
 
 class Student extends Group {
     state: {
@@ -15,6 +15,8 @@ class Student extends Group {
         isDead: boolean;
     };
     mixer!: THREE.AnimationMixer;
+    gltfModel!: GLTF;
+    deathSound!: Audio;
 
     constructor(parent: SeedScene) {
         super();
@@ -28,16 +30,16 @@ class Student extends Group {
             isDead: false,
         };
 
-        // Load FBX model
-        const loader = new FBXLoader();
+        const loader = new GLTFLoader();
 
         this.name = 'student';
-        loader.load(MODEL, (fbx) => {
-            this.mixer = new THREE.AnimationMixer(fbx);
+        loader.load(MODEL, (gltf) => {
+            this.gltfModel = gltf;
+            this.mixer = new THREE.AnimationMixer(gltf.scene);
 
-            this.mixer.clipAction(fbx.animations[1]).play();
-            fbx.scale.set(0.01, 0.01, 0.01);
-            this.add(fbx);
+            this.mixer.clipAction(gltf.animations[1]).play();
+            gltf.scene.scale.set(1.5, 1.5, 1.5);
+            this.add(gltf.scene);
         });
 
         // Add self to parent's update list
@@ -46,18 +48,55 @@ class Student extends Group {
 
     // get the bounding box of the raccoon
     getBoundingBox(): THREE.Box3 {
-        const boundingBox = new THREE.Box3().setFromObject(this);
-        const size = new THREE.Vector3();
-        boundingBox.getSize(size);
-        size.multiplyScalar(0.9); // Scale down by 20%
-        boundingBox.expandByVector(size.negate().multiplyScalar(0.5));
+        const boundingBox = new THREE.Box3();
+        boundingBox.setFromObject(this);
         return boundingBox;
     }
 
+    playDeathAnimation = () => {
+        // Stop the current animation
+        if (this.mixer) {
+            const currentAction = this.mixer.clipAction(
+                this.gltfModel.animations[1]
+            );
+            currentAction.stop();
+        }
+
+        // Play the death animation once
+        if (this.mixer && this.gltfModel.animations[0]) {
+            const deathAction = this.mixer.clipAction(
+                this.gltfModel.animations[0]
+            );
+            deathAction.setLoop(THREE.LoopOnce, 1);
+            deathAction.clampWhenFinished = true;
+            deathAction.play();
+        }
+        this.parent.playDeathSound(this.position);
+    };
+    removeSelf(): void {
+        // Check if the parent's state.students array exists and contains this instance
+        if (this.parent.state.students) {
+            // Filter out this instance from the parent's state.students array
+            this.parent.state.students = this.parent.state.students.filter(
+                (student) => student !== this
+            );
+        }
+    }
     handleCollision(): void {
         // Set the raccoon as dead
+        if (this.state.isDead) {
+            return;
+        }
         this.state.isDead = true;
-
+        // Create and dispatch a custom event with details
+        // const event = new CustomEvent('studentKilled', {
+        //     detail: { killedBy: this },
+        // });
+        // document.dispatchEvent(event);
+        // console.log('hi');
+        this.parent.car.incrementStudentScore();
+        this.playDeathAnimation();
+        this.removeSelf();
         // Here, you can also trigger any animations or actions for the student
         // For example, stopping movement, playing a death animation, etc
     }
@@ -73,6 +112,12 @@ class Student extends Group {
 
             this.position.x += deltaX;
             this.position.z += deltaZ;
+        }
+        if (this.state.isDead) {
+            if (this.mixer) {
+                this.mixer.update(0.02);
+            }
+            return;
         }
     }
 }

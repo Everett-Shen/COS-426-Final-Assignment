@@ -1,22 +1,24 @@
 import { Group } from 'three';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import SeedScene from '../scenes/SeedScene';
 
 import MODEL from './Raccoon.glb?url';
-
+import Student from './Student';
+const EPS = 5;
 class Raccoon extends Group {
     state: {
         gui: dat.GUI;
         animate: boolean;
-        // clock: THREE.Clock;
         speed: number;
         direction: number;
         lastUpdatedTimestep: number;
         isDead: boolean;
+        verticalVelocity: number;
     };
     mixer!: THREE.AnimationMixer;
+    gltfModel!: GLTF;
     constructor(parent: SeedScene) {
         super();
 
@@ -28,13 +30,18 @@ class Raccoon extends Group {
             direction: Math.random() * 2 * Math.PI,
             lastUpdatedTimestep: 0,
             isDead: false,
+            verticalVelocity: 0, // Starting with no vertical movement
         };
+
+        // this.position.y = 50; // Start falling from y = 50 units
+        // console.log('Initial Y position set in constructor:', this.position.y);
 
         // Load GLTF model
         const loader = new GLTFLoader();
 
         this.name = 'raccoon';
         loader.load(MODEL, (gltf) => {
+            this.gltfModel = gltf;
             this.mixer = new THREE.AnimationMixer(gltf.scene);
             this.mixer.clipAction(gltf.animations[6]).play(); // run
             gltf.scene.scale.set(0.05, 0.05, 0.05);
@@ -46,8 +53,15 @@ class Raccoon extends Group {
     updateDirection(direction: number): void {
         this.state.direction = direction;
     }
+    removeSelf(): void {
+        if (this.parent.state.raccoons) {
+            this.parent.state.raccoons = this.parent.state.raccoons.filter(
+                (raccoon) => raccoon !== this
+            );
+        }
+    }
 
-    findClosestStudent(): THREE.Group | null {
+    findClosestStudent(): Student | null {
         let closestStudent = null;
         let minDistance = Infinity;
 
@@ -74,13 +88,40 @@ class Raccoon extends Group {
         boundingBox.setFromObject(this);
         return boundingBox;
     }
+    playDeathAnimation = () => {
+        // TODO: play sound effect
+
+        // Stop the current animation (running)
+        if (this.mixer) {
+            const currentAction = this.mixer.clipAction(
+                this.gltfModel.animations[6]
+            );
+            currentAction.stop();
+        }
+
+        // Start the new animation (e.g., death animation)
+        if (this.mixer && this.gltfModel.animations[0]) {
+            const newAction = this.mixer.clipAction(
+                this.gltfModel.animations[0]
+            );
+            newAction.play();
+        }
+        if (this.mixer) {
+            this.mixer.update(0.04);
+        }
+        this.parent.playDeathSound(this.position, true);
+    };
 
     handleCollision(): void {
-        // Set the raccoon as dead
-        this.state.isDead = true;
+        if (!this.state.isDead) {
+            this.state.isDead = true;
+            this.playDeathAnimation(); // Play death animation
+            // No need to update score here, as it's handled by the Car class
+        }
 
-        // Here, you can also trigger any animations or actions for the raccoon
-        // For example, stopping movement, playing a death animation, etc
+        this.state.isDead = true;
+        this.playDeathAnimation();
+        this.removeSelf();
     }
 
     update(timeStamp: number): void {
@@ -89,8 +130,24 @@ class Raccoon extends Group {
                 this.mixer.update(0.04);
             }
 
+            // Apply gravity
+            const gravity = -9.8;
+            const timeDelta = 0.1; // Convert timeStamp from ms to seconds
+            this.state.verticalVelocity += gravity * timeDelta;
+
+            // Update the y-position based on the vertical velocity
+            this.position.y += this.state.verticalVelocity * timeDelta;
+
+            // Check if raccoon has hit the ground
+            const groundLevel = 0; // Assuming your ground is at y = 0
+            if (this.position.y <= groundLevel) {
+                this.position.y = groundLevel; // Place raccoon on the ground
+                this.state.verticalVelocity = 0; // Stop falling
+                // Trigger any landing effects or animations here
+            }
+
             // update direction based on closest students
-            if (timeStamp - this.state.lastUpdatedTimestep > 1000) {
+            if (timeStamp - this.state.lastUpdatedTimestep > 500) {
                 this.state.lastUpdatedTimestep = timeStamp;
                 let closestStudent = this.findClosestStudent();
                 if (closestStudent) {
@@ -100,6 +157,12 @@ class Raccoon extends Group {
                     let rotation = Math.atan2(direction.x, direction.z);
                     this.state.direction = rotation;
                     this.rotation.y = rotation;
+                    let distance = closestStudent.position.distanceTo(
+                        this.position
+                    );
+                    if (distance && distance < EPS) {
+                        closestStudent.handleCollision();
+                    }
                 }
             }
             const deltaX = Math.sin(this.state.direction) * this.state.speed;
