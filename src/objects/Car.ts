@@ -18,8 +18,8 @@ export default class Car extends Object3D {
         this.velocity = new Vector3();
         this.acceleration = 0.01;
         this.deceleration = 0.01;
-        this.maxSpeed = 0.5;
-        this.rotationSpeed = 0.07;
+        this.maxSpeed = 1;
+        this.rotationSpeed = 0.02;
         this.inputHandler = new InputHandler();
 
         // Load the model
@@ -136,5 +136,9 @@ export default class Car extends Object3D {
         const boundingBox = new Box3();
         boundingBox.setFromObject(this);
         return boundingBox;
+    }
+
+    setVelocityZero(): void {
+        this.velocity = new Vector3();
     }
 }
