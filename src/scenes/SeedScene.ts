@@ -25,6 +25,8 @@ class SeedScene extends Scene {
         students: Student[];
         raccoons: Raccoon[];
         points: number;
+        lastRaccoonSpawnedTime: number;
+        lastStudentSpawnedTime: number;
     };
     listener: AudioListener;
     deathSound!: Audio;
@@ -53,6 +55,31 @@ class SeedScene extends Scene {
         return position;
     }
 
+    addRaccoon() {
+        let newRaccoon = new Raccoon(this);
+        let randomPosition = this.getRandomPosition(
+            this.state.students,
+            MAP_WIDTH * 0.1
+        ); // 10 is the minimum distance
+        newRaccoon.position.copy(randomPosition);
+        newRaccoon.position.y = 10;
+        this.add(newRaccoon);
+        this.state.raccoons.push(newRaccoon);
+        this.updateLiveRaccoons();
+    }
+
+    addStudent() {
+        let newStudent = new Student(this);
+        let randomPosition = this.getRandomPosition(
+            [...this.state.students, ...this.state.raccoons],
+            10
+        );
+        newStudent.position.copy(randomPosition);
+        this.add(newStudent);
+        this.state.students.push(newStudent);
+        this.updateLiveStudents();
+    }
+
     constructor() {
         super();
 
@@ -63,6 +90,8 @@ class SeedScene extends Scene {
             students: [],
             raccoons: [],
             points: 0,
+            lastRaccoonSpawnedTime: 0,
+            lastStudentSpawnedTime: 0,
         };
         this.listener = new AudioListener();
 
@@ -85,27 +114,12 @@ class SeedScene extends Scene {
 
         // Adding raccoons
         for (let i = 0; i < RACCOON_COUNT; i++) {
-            let newRaccoon = new Raccoon(this);
-            let randomPosition = this.getRandomPosition(
-                this.state.students,
-                MAP_WIDTH * 0.1
-            ); // 10 is the minimum distance
-            newRaccoon.position.copy(randomPosition);
-            newRaccoon.position.y = 10;
-            this.add(newRaccoon);
-            this.state.raccoons.push(newRaccoon);
+            this.addRaccoon();
         }
 
         // Adding students
         for (let i = 0; i < STUDENT_COUNT; i++) {
-            let newStudent = new Student(this);
-            let randomPosition = this.getRandomPosition(
-                [...this.state.students, ...this.state.raccoons],
-                10
-            );
-            newStudent.position.copy(randomPosition);
-            this.add(newStudent);
-            this.state.students.push(newStudent);
+            this.addStudent();
         }
 
         // Load and play the death sound
@@ -154,12 +168,6 @@ class SeedScene extends Scene {
             );
             this.deathSound.play();
         }
-        // Listen for student killed event
-        // document.addEventListener('studentKilled', (event: Event) => {
-        //     // Use type assertion if needed to access the detail property
-        //     // const customEvent = event as CustomEvent;
-        //     this.car.incrementStudentScore();
-        // });
     }
 
     addToUpdateList(object: UpdateChild): void {
@@ -169,6 +177,20 @@ class SeedScene extends Scene {
     // Getter for the car object
     getCar() {
         return this.car;
+    }
+
+    updateLiveStudents(): void {
+        const scoreElement = document.getElementById('live-students');
+        if (scoreElement) {
+            scoreElement.textContent = `Live Students: ${this.state.students.length}`;
+        }
+    }
+
+    updateLiveRaccoons(): void {
+        const scoreElement = document.getElementById('live-raccoons');
+        if (scoreElement) {
+            scoreElement.textContent = `Live Raccoons: ${this.state.raccoons.length}`;
+        }
     }
 
     update(timeStamp: number): void {
@@ -223,6 +245,16 @@ class SeedScene extends Scene {
             if (obj.update !== undefined) {
                 obj.update(timeStamp);
             }
+        }
+
+        // spawn raccoons and students
+        if (timeStamp - this.state.lastRaccoonSpawnedTime > 5000) {
+            this.state.lastRaccoonSpawnedTime = timeStamp;
+            this.addRaccoon();
+        }
+        if (timeStamp - this.state.lastStudentSpawnedTime > 5000) {
+            this.state.lastStudentSpawnedTime = timeStamp;
+            this.addStudent();
         }
     }
 }

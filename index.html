@@ -16,7 +16,9 @@
                 padding: 5px;
                 border-radius: 5px;
             }
-            #dead {
+            #dead,
+            #live-students,
+            #live-raccoons {
                 position: fixed;
                 top: 100px;
                 left: 30px;
@@ -26,11 +28,19 @@
                 padding: 5px;
                 border-radius: 5px;
             }
+            #live-students {
+                top: 150px; /* Adjust as needed */
+            }
+            #live-raccoons {
+                top: 200px; /* Adjust as needed */
+            }
         </style>
     </head>
     <body>
         <div id="score">Score: 0</div>
         <div id="dead">Dead Students: 0</div>
+        <div id="live-students">Live Students: 0</div>
+        <div id="live-raccoons">Live Raccoons: 0</div>
         <script type="module" src="/src/app.ts"></script>
     </body>
 </html>

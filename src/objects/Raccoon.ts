@@ -122,6 +122,7 @@ class Raccoon extends Group {
         this.state.isDead = true;
         this.playDeathAnimation();
         this.removeSelf();
+        this.parent.updateLiveRaccoons();
     }
 
     update(timeStamp: number): void {
@@ -131,7 +132,7 @@ class Raccoon extends Group {
             }
 
             // Apply gravity
-            const gravity = -9.8;
+            const gravity = -1;
             const timeDelta = 0.1; // Convert timeStamp from ms to seconds
             this.state.verticalVelocity += gravity * timeDelta;
 
