@@ -19,22 +19,7 @@ type UpdateChild = {
 };
 const RACCOON_COUNT = 3;
 const STUDENT_COUNT = 3;
-const MAP_WIDTH = 20;
-
-export const getRandomPosition: () => THREE.Vector3 = () => {
-    return new THREE.Vector3(
-        Math.random() * MAP_WIDTH,
-        0,
-        Math.random() * MAP_WIDTH
-    );
-};
-
-export const assignRandomPosition = (v: THREE.Vector3) => {
-    const position = getRandomPosition();
-    v.x = position.x;
-    v.y = position.y;
-    v.z = position.z;
-};
+const MAP_WIDTH = 70;
 
 class SeedScene extends Scene {
     private car: Car; //  property for the car
@@ -49,6 +34,29 @@ class SeedScene extends Scene {
         raccoons: Raccoon[];
         points: number
     };
+
+    getRandomPosition(
+        existingObjects: { position: THREE.Vector3 }[],
+        minDistance: number
+    ) {
+        let position!: THREE.Vector3;
+        let tooClose;
+        do {
+            position = new THREE.Vector3(
+                Math.random() * MAP_WIDTH,
+                0, // Assuming y is up and you want to spawn objects on the ground
+                Math.random() * MAP_WIDTH
+            );
+
+            tooClose = existingObjects.some(
+                (obj) => obj.position.distanceTo(position) < minDistance
+            );
+        } while (tooClose);
+
+        console.log(position);
+
+        return position;
+    }
 
     constructor() {
         super();
@@ -79,16 +87,26 @@ class SeedScene extends Scene {
         const lights = new BasicLights();
         this.add(lights);
 
-        // add raccoons
+        // Adding raccoons
         for (let i = 0; i < RACCOON_COUNT; i++) {
             let newRaccoon = new Raccoon(this);
+            let randomPosition = this.getRandomPosition(
+                this.state.students,
+                30
+            ); // 10 is the minimum distance
+            newRaccoon.position.copy(randomPosition);
             this.add(newRaccoon);
             this.state.raccoons.push(newRaccoon);
         }
 
-        // add students
+        // Adding students
         for (let i = 0; i < STUDENT_COUNT; i++) {
             let newStudent = new Student(this);
+            let randomPosition = this.getRandomPosition(
+                [...this.state.students, ...this.state.raccoons],
+                30
+            );
+            newStudent.position.copy(randomPosition);
             this.add(newStudent);
             this.state.students.push(newStudent);
         }
