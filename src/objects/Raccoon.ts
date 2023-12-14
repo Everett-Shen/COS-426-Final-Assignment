@@ -5,7 +5,8 @@ import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import SeedScene from '../scenes/SeedScene';
 
 import MODEL from './Raccoon.glb?url';
-
+import Student from './Student';
+const EPS = 5;
 class Raccoon extends Group {
     state: {
         gui: dat.GUI;
@@ -17,7 +18,8 @@ class Raccoon extends Group {
         verticalVelocity: number;
     };
     mixer!: THREE.AnimationMixer;
-    gltfModel: GLTF;
+    gltfModel!: GLTF;
+
     constructor(parent: SeedScene) {
         super();
 
@@ -53,7 +55,7 @@ class Raccoon extends Group {
         this.state.direction = direction;
     }
 
-    findClosestStudent(): THREE.Group | null {
+    findClosestStudent(): Student | null {
         let closestStudent = null;
         let minDistance = Infinity;
 
@@ -105,6 +107,10 @@ class Raccoon extends Group {
 
     handleCollision(): void {
         // Set the raccoon as dead
+        if (this.state.isDead) {
+            return;
+        }
+
         this.state.isDead = true;
         this.playDeathAnimation();
     }
@@ -131,10 +137,8 @@ class Raccoon extends Group {
                 // Trigger any landing effects or animations here
             }
 
-            console.log(this.position.y);
-
             // update direction based on closest students
-            if (timeStamp - this.state.lastUpdatedTimestep > 1000) {
+            if (timeStamp - this.state.lastUpdatedTimestep > 500) {
                 this.state.lastUpdatedTimestep = timeStamp;
                 let closestStudent = this.findClosestStudent();
                 if (closestStudent) {
@@ -144,6 +148,12 @@ class Raccoon extends Group {
                     let rotation = Math.atan2(direction.x, direction.z);
                     this.state.direction = rotation;
                     this.rotation.y = rotation;
+                    let distance = closestStudent.position.distanceTo(
+                        this.position
+                    );
+                    if (distance && distance < EPS) {
+                        closestStudent.handleCollision();
+                    }
                 }
             }
             const deltaX = Math.sin(this.state.direction) * this.state.speed;

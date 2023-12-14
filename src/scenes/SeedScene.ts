@@ -10,9 +10,9 @@ import School from '../objects/School';
 type UpdateChild = {
     update?: (timeStamp: number) => void;
 };
-const RACCOON_COUNT = 3;
-const STUDENT_COUNT = 3;
-const MAP_WIDTH = 50;
+const RACCOON_COUNT = 10;
+const STUDENT_COUNT = 10;
+const MAP_WIDTH = 500;
 
 class SeedScene extends Scene {
     private car: Car; //  property for the car
@@ -35,9 +35,9 @@ class SeedScene extends Scene {
         let tooClose;
         do {
             position = new THREE.Vector3(
-                Math.random() * MAP_WIDTH,
+                Math.random() * MAP_WIDTH - MAP_WIDTH / 2,
                 0, // Assuming y is up and you want to spawn objects on the ground
-                Math.random() * MAP_WIDTH
+                Math.random() * MAP_WIDTH - MAP_WIDTH / 2
             );
 
             tooClose = existingObjects.some(
@@ -82,7 +82,7 @@ class SeedScene extends Scene {
             let newRaccoon = new Raccoon(this);
             let randomPosition = this.getRandomPosition(
                 this.state.students,
-                10
+                MAP_WIDTH * 0.1
             ); // 10 is the minimum distance
             newRaccoon.position.copy(randomPosition);
             newRaccoon.position.y = 10;

@@ -56,8 +56,7 @@ class Student extends Group {
 
     playDeathAnimation = () => {
         // TODO: play sound effect
-
-        // Stop the current animation (running)
+        // Stop the current animation
         if (this.mixer) {
             const currentAction = this.mixer.clipAction(
                 this.gltfModel.animations[1]
@@ -65,20 +64,34 @@ class Student extends Group {
             currentAction.stop();
         }
 
+        // Play the death animation once
         if (this.mixer && this.gltfModel.animations[0]) {
-            const newAction = this.mixer.clipAction(
+            const deathAction = this.mixer.clipAction(
                 this.gltfModel.animations[0]
             );
-            newAction.play();
-        }
-        if (this.mixer) {
-            this.mixer.update(0.1);
+            deathAction.setLoop(THREE.LoopOnce);
+            deathAction.clampWhenFinished = true;
+            deathAction.play();
         }
     };
+    removeSelf(): void {
+        // Check if the parent's state.students array exists and contains this instance
+        if (this.parent.state.students) {
+            // Filter out this instance from the parent's state.students array
+            this.parent.state.students = this.parent.state.students.filter(
+                (student) => student !== this
+            );
+        }
+    }
     handleCollision(): void {
         // Set the raccoon as dead
+        if (this.state.isDead) {
+            return;
+        }
+        console.log('Dead');
         this.state.isDead = true;
         this.playDeathAnimation();
+        this.removeSelf();
         // Here, you can also trigger any animations or actions for the student
         // For example, stopping movement, playing a death animation, etc
     }
@@ -94,6 +107,12 @@ class Student extends Group {
 
             this.position.x += deltaX;
             this.position.z += deltaZ;
+        }
+        if (this.state.isDead) {
+            if (this.mixer) {
+                this.mixer.update(0.02);
+            }
+            return;
         }
     }
 }

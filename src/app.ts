@@ -19,8 +19,6 @@ const renderer = new WebGLRenderer({ antialias: true });
 camera.position.set(6, 3, -10);
 camera.lookAt(new Vector3(0, 0, 0));
 
-console.log(camera.position);
-
 // Set up renderer, canvas, and minor CSS adjustments
 renderer.setPixelRatio(window.devicePixelRatio);
 const canvas = renderer.domElement;
