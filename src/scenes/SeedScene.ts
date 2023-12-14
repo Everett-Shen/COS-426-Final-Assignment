@@ -19,7 +19,7 @@ type UpdateChild = {
 };
 const RACCOON_COUNT = 3;
 const STUDENT_COUNT = 3;
-const MAP_WIDTH = 70;
+const MAP_WIDTH = 50;
 
 class SeedScene extends Scene {
     private car: Car; //  property for the car
@@ -49,8 +49,6 @@ class SeedScene extends Scene {
                 (obj) => obj.position.distanceTo(position) < minDistance
             );
         } while (tooClose);
-
-        console.log(position);
 
         return position;
     }
@@ -84,9 +82,10 @@ class SeedScene extends Scene {
             let newRaccoon = new Raccoon(this);
             let randomPosition = this.getRandomPosition(
                 this.state.students,
-                30
+                10
             ); // 10 is the minimum distance
             newRaccoon.position.copy(randomPosition);
+            newRaccoon.position.y = 10;
             this.add(newRaccoon);
             this.state.raccoons.push(newRaccoon);
         }
@@ -96,7 +95,7 @@ class SeedScene extends Scene {
             let newStudent = new Student(this);
             let randomPosition = this.getRandomPosition(
                 [...this.state.students, ...this.state.raccoons],
-                30
+                10
             );
             newStudent.position.copy(randomPosition);
             this.add(newStudent);

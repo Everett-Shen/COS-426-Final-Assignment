@@ -10,11 +10,11 @@ class Raccoon extends Group {
     state: {
         gui: dat.GUI;
         animate: boolean;
-        // clock: THREE.Clock;
         speed: number;
         direction: number;
         lastUpdatedTimestep: number;
         isDead: boolean;
+        verticalVelocity: number;
     };
     mixer!: THREE.AnimationMixer;
     constructor(parent: SeedScene) {
@@ -28,7 +28,11 @@ class Raccoon extends Group {
             direction: Math.random() * 2 * Math.PI,
             lastUpdatedTimestep: 0,
             isDead: false,
+            verticalVelocity: 0, // Starting with no vertical movement
         };
+
+        // this.position.y = 50; // Start falling from y = 50 units
+        // console.log('Initial Y position set in constructor:', this.position.y);
 
         // Load GLTF model
         const loader = new GLTFLoader();
@@ -88,6 +92,24 @@ class Raccoon extends Group {
             if (this.mixer) {
                 this.mixer.update(0.04);
             }
+
+            // Apply gravity
+            const gravity = -9.8;
+            const timeDelta = 0.1; // Convert timeStamp from ms to seconds
+            this.state.verticalVelocity += gravity * timeDelta;
+
+            // Update the y-position based on the vertical velocity
+            this.position.y += this.state.verticalVelocity * timeDelta;
+
+            // Check if raccoon has hit the ground
+            const groundLevel = 0; // Assuming your ground is at y = 0
+            if (this.position.y <= groundLevel) {
+                this.position.y = groundLevel; // Place raccoon on the ground
+                this.state.verticalVelocity = 0; // Stop falling
+                // Trigger any landing effects or animations here
+            }
+
+            console.log(this.position.y);
 
             // update direction based on closest students
             if (timeStamp - this.state.lastUpdatedTimestep > 1000) {
