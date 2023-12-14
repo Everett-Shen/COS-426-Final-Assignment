@@ -1,4 +1,4 @@
-import { Scene, Color, Fog, AudioListener, Audio, AudioLoader } from 'three';
+import { Scene, Color, Fog, AudioListener, AudioLoader, Audio } from 'three';
 import dat from 'dat.gui';
 import * as THREE from 'three';
 import Raccoon from '../objects/Raccoon';
@@ -14,11 +14,12 @@ type UpdateChild = {
 const RACCOON_COUNT = 10;
 const STUDENT_COUNT = 10;
 const MAP_WIDTH = 125;
-const SPAWN_DIST = 50;
+const MIN_DIST = 20;
 
 class SeedScene extends Scene {
     private car: Car; //  property for the car
-    private school: School; // property for the school
+    private grass: Grass; // property for the school
+    private school: School;
 
     state: {
         gui: dat.GUI;
@@ -74,7 +75,7 @@ class SeedScene extends Scene {
         let newStudent = new Student(this);
         let randomPosition = this.getRandomPosition(
             [...this.state.students, ...this.state.raccoons],
-            10
+            MIN_DIST
         );
         newStudent.position.copy(randomPosition);
         this.add(newStudent);
@@ -209,6 +210,7 @@ class SeedScene extends Scene {
 
         const { updateList, raccoons, students } = this.state;
         const carBoundingBox = this.car.getBoundingBox(); // Correctly access the car property
+        const schoolBoundingBox = this.school.getBoundingBox();
         const grassBoundingBox = this.grass.getBoundingBox();
 
         raccoons.forEach((raccoon) => {
