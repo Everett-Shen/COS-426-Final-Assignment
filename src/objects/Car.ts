@@ -19,7 +19,7 @@ export default class Car extends Object3D {
         this.acceleration = 0.01;
         this.deceleration = 0.01;
         this.maxSpeed = 0.5;
-        this.rotationSpeed = 0.02;
+        this.rotationSpeed = 0.07;
         this.inputHandler = new InputHandler();
 
         // Load the model
