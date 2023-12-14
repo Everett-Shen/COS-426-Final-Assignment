@@ -2,7 +2,7 @@ import { Group } from 'three';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-import SeedScene, { assignRandomPosition } from '../scenes/SeedScene';
+import SeedScene from '../scenes/SeedScene';
 
 import MODEL from './Raccoon.glb?url';
 
@@ -40,7 +40,6 @@ class Raccoon extends Group {
             gltf.scene.scale.set(0.05, 0.05, 0.05);
             this.add(gltf.scene);
         });
-        assignRandomPosition(this.position);
         // Add self to parent's update list
         parent.addToUpdateList(this);
     }

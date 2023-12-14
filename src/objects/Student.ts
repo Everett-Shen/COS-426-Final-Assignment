@@ -2,7 +2,7 @@ import { Group } from 'three';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
-import SeedScene, { assignRandomPosition } from '../scenes/SeedScene';
+import SeedScene from '../scenes/SeedScene';
 
 import MODEL from './bryce.fbx?url';
 
@@ -39,8 +39,6 @@ class Student extends Group {
             fbx.scale.set(0.01, 0.01, 0.01);
             this.add(fbx);
         });
-
-        assignRandomPosition(this.position);
 
         // Add self to parent's update list
         parent.addToUpdateList(this);
