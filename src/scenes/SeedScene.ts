@@ -1,5 +1,4 @@
 import { Scene, Color, Fog, MeshBasicMaterial, Mesh } from 'three';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import dat from 'dat.gui';
 import * as THREE from 'three';
 import Raccoon from '../objects/Raccoon';
