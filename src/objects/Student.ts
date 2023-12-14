@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-import SeedScene, { assignRandomPosition } from '../scenes/SeedScene';
+import SeedScene from '../scenes/SeedScene';
 
 import MODEL from './test.glb?url';
 import DYING_MODEL from './remy_dying.fbx?url';
@@ -42,8 +42,6 @@ class Student extends Group {
             gltf.scene.scale.set(1.5, 1.5, 1.5);
             this.add(gltf.scene);
         });
-
-        assignRandomPosition(this.position);
 
         // Add self to parent's update list
         parent.addToUpdateList(this);

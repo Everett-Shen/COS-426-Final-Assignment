@@ -42,7 +42,7 @@ const thirdPersonCamera = new ThirdPersonCamera(camera, scene.getCar());
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp: number) => {
-    thirdPersonCamera.update(timeStamp); // Update the camera position based on the car
+    thirdPersonCamera.update(); // Update the camera position based on the car
 
     renderer.render(scene, camera);
     scene.update && scene.update(timeStamp);
