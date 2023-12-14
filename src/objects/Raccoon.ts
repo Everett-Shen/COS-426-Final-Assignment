@@ -162,11 +162,6 @@ class Raccoon extends Group {
                     );
                     if (distance && distance < EPS) {
                         closestStudent.handleCollision();
-                        // Create and dispatch a custom event with details
-                        const event = new CustomEvent('studentKilled', {
-                            detail: { killedBy: this },
-                        });
-                        document.dispatchEvent(event);
                     }
                 }
             }

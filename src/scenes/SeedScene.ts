@@ -155,16 +155,11 @@ class SeedScene extends Scene {
             this.deathSound.play();
         }
         // Listen for student killed event
-        document.addEventListener('studentKilled', (event: Event) => {
-            // Use type assertion if needed to access the detail property
-            const customEvent = event as CustomEvent;
-            if (
-                customEvent.detail &&
-                customEvent.detail.killedBy instanceof Raccoon
-            ) {
-                this.car.incrementStudentScore();
-            }
-        });
+        // document.addEventListener('studentKilled', (event: Event) => {
+        //     // Use type assertion if needed to access the detail property
+        //     // const customEvent = event as CustomEvent;
+        //     this.car.incrementStudentScore();
+        // });
     }
 
     addToUpdateList(object: UpdateChild): void {
@@ -197,7 +192,6 @@ class SeedScene extends Scene {
                 carBoundingBox.intersectsBox(student.getBoundingBox())
             ) {
                 student.handleCollision();
-                this.car.incrementStudentScore();
             }
         });
 

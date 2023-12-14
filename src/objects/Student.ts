@@ -87,8 +87,14 @@ class Student extends Group {
         if (this.state.isDead) {
             return;
         }
-        console.log('Dead');
         this.state.isDead = true;
+        // Create and dispatch a custom event with details
+        // const event = new CustomEvent('studentKilled', {
+        //     detail: { killedBy: this },
+        // });
+        // document.dispatchEvent(event);
+        // console.log('hi');
+        this.parent.car.incrementStudentScore();
         this.playDeathAnimation();
         this.removeSelf();
         // Here, you can also trigger any animations or actions for the student
