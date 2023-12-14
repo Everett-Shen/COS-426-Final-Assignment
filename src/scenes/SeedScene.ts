@@ -101,6 +101,18 @@ class SeedScene extends Scene {
             this.add(newStudent);
             this.state.students.push(newStudent);
         }
+
+        // Listen for student killed event
+        document.addEventListener('studentKilled', (event: Event) => {
+            // Use type assertion if needed to access the detail property
+            const customEvent = event as CustomEvent;
+            if (
+                customEvent.detail &&
+                customEvent.detail.killedBy instanceof Raccoon
+            ) {
+                this.car.incrementStudentScore();
+            }
+        });
     }
 
     addToUpdateList(object: UpdateChild): void {
@@ -118,17 +130,22 @@ class SeedScene extends Scene {
         const schoolBoundingBox = this.school.getBoundingBox();
 
         raccoons.forEach((raccoon) => {
-            if (carBoundingBox.intersectsBox(raccoon.getBoundingBox())) {
+            if (
+                !raccoon.state.isDead &&
+                carBoundingBox.intersectsBox(raccoon.getBoundingBox())
+            ) {
                 raccoon.handleCollision();
-                this.state.points += 1;
-                console.log(this.state.points);
+                this.car.incrementRaccoonScore();
             }
         });
 
         students.forEach((student) => {
-            if (carBoundingBox.intersectsBox(student.getBoundingBox())) {
+            if (
+                !student.state.isDead &&
+                carBoundingBox.intersectsBox(student.getBoundingBox())
+            ) {
                 student.handleCollision();
-                this.state.points -= 1;
+                this.car.incrementStudentScore();
             }
         });
 

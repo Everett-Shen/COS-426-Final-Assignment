@@ -9,6 +9,8 @@ export default class Car extends Object3D {
     private maxSpeed: number;
     private rotationSpeed: number;
     private inputHandler: InputHandler; // An instance of InputHandler
+    private raccoonScore: number;
+    private studentScore: number;
 
     private isAccelerating: boolean = false;
     private isDecelerating: boolean = false;
@@ -21,6 +23,8 @@ export default class Car extends Object3D {
         this.maxSpeed = 1;
         this.rotationSpeed = 0.1;
         this.inputHandler = new InputHandler();
+        this.raccoonScore = 0;
+        this.studentScore = 0;
 
         // Load the model
         const loader = new GLTFLoader();
@@ -61,6 +65,32 @@ export default class Car extends Object3D {
 
         // Apply velocity and direction to update position and rotation
         this.applyMovement();
+    }
+
+    // Methods to increment score
+    public incrementRaccoonScore(): void {
+        this.raccoonScore++;
+        this.updateRaccoonScoreDisplay();
+    }
+
+    public incrementStudentScore(): void {
+        this.studentScore++;
+        this.updateStudentScoreDisplay();
+    }
+
+    // Method to update the score display
+    private updateRaccoonScoreDisplay(): void {
+        const scoreElement = document.getElementById('score');
+        if (scoreElement) {
+            scoreElement.textContent = `Score: ${this.raccoonScore}`;
+        }
+    }
+
+    private updateStudentScoreDisplay(): void {
+        const scoreElement = document.getElementById('dead');
+        if (scoreElement) {
+            scoreElement.textContent = `Dead Students: ${this.studentScore}`;
+        }
     }
 
     // Movement methods

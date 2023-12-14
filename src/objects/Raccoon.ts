@@ -19,7 +19,6 @@ class Raccoon extends Group {
     };
     mixer!: THREE.AnimationMixer;
     gltfModel!: GLTF;
-
     constructor(parent: SeedScene) {
         super();
 
@@ -106,13 +105,11 @@ class Raccoon extends Group {
     };
 
     handleCollision(): void {
-        // Set the raccoon as dead
-        if (this.state.isDead) {
-            return;
+        if (!this.state.isDead) {
+            this.state.isDead = true;
+            this.playDeathAnimation(); // Play death animation
+            // No need to update score here, as it's handled by the Car class
         }
-
-        this.state.isDead = true;
-        this.playDeathAnimation();
     }
 
     update(timeStamp: number): void {
@@ -153,6 +150,11 @@ class Raccoon extends Group {
                     );
                     if (distance && distance < EPS) {
                         closestStudent.handleCollision();
+                        // Create and dispatch a custom event with details
+                        const event = new CustomEvent('studentKilled', {
+                            detail: { killedBy: this },
+                        });
+                        document.dispatchEvent(event);
                     }
                 }
             }

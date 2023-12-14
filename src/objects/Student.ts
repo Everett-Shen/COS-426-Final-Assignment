@@ -1,12 +1,10 @@
 import { Group } from 'three';
 import * as THREE from 'three';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import SeedScene from '../scenes/SeedScene';
 
 import MODEL from './test.glb?url';
-import DYING_MODEL from './remy_dying.fbx?url';
 
 class Student extends Group {
     state: {
@@ -17,7 +15,7 @@ class Student extends Group {
         isDead: boolean;
     };
     mixer!: THREE.AnimationMixer;
-    gltfModel: GLTF;
+    gltfModel!: GLTF;
 
     constructor(parent: SeedScene) {
         super();
@@ -69,7 +67,7 @@ class Student extends Group {
             const deathAction = this.mixer.clipAction(
                 this.gltfModel.animations[0]
             );
-            deathAction.setLoop(THREE.LoopOnce);
+            deathAction.setLoop(THREE.LoopOnce, 1);
             deathAction.clampWhenFinished = true;
             deathAction.play();
         }
