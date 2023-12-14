@@ -1,4 +1,4 @@
-import { Group } from 'three';
+import { Group, Audio } from 'three';
 import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
@@ -16,6 +16,7 @@ class Student extends Group {
     };
     mixer!: THREE.AnimationMixer;
     gltfModel!: GLTF;
+    deathSound!: Audio;
 
     constructor(parent: SeedScene) {
         super();
@@ -53,7 +54,6 @@ class Student extends Group {
     }
 
     playDeathAnimation = () => {
-        // TODO: play sound effect
         // Stop the current animation
         if (this.mixer) {
             const currentAction = this.mixer.clipAction(
@@ -71,6 +71,7 @@ class Student extends Group {
             deathAction.clampWhenFinished = true;
             deathAction.play();
         }
+        this.parent.playDeathSound(this.position);
     };
     removeSelf(): void {
         // Check if the parent's state.students array exists and contains this instance
@@ -86,12 +87,12 @@ class Student extends Group {
         if (this.state.isDead) {
             return;
         }
-        console.log('Dead');
         this.state.isDead = true;
+
+        this.parent.car.incrementStudentScore();
         this.playDeathAnimation();
         this.removeSelf();
-        // Here, you can also trigger any animations or actions for the student
-        // For example, stopping movement, playing a death animation, etc
+        this.parent.updateLiveStudents();
     }
 
     update(): void {

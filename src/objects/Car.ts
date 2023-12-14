@@ -21,7 +21,7 @@ export default class Car extends Object3D {
         this.acceleration = 0.01;
         this.deceleration = 0.01;
         this.maxSpeed = 1;
-        this.rotationSpeed = 0.1;
+        this.rotationSpeed = 0.05;
         this.inputHandler = new InputHandler();
         this.raccoonScore = 0;
         this.studentScore = 0;

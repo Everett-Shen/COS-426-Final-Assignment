@@ -53,6 +53,13 @@ class Raccoon extends Group {
     updateDirection(direction: number): void {
         this.state.direction = direction;
     }
+    removeSelf(): void {
+        if (this.parent.state.raccoons) {
+            this.parent.state.raccoons = this.parent.state.raccoons.filter(
+                (raccoon) => raccoon !== this
+            );
+        }
+    }
 
     findClosestStudent(): Student | null {
         let closestStudent = null;
@@ -102,6 +109,7 @@ class Raccoon extends Group {
         if (this.mixer) {
             this.mixer.update(0.04);
         }
+        this.parent.playDeathSound(this.position, true);
     };
 
     handleCollision(): void {
@@ -110,6 +118,11 @@ class Raccoon extends Group {
             this.playDeathAnimation(); // Play death animation
             // No need to update score here, as it's handled by the Car class
         }
+
+        this.state.isDead = true;
+        this.playDeathAnimation();
+        this.removeSelf();
+        this.parent.updateLiveRaccoons();
     }
 
     update(timeStamp: number): void {
@@ -119,7 +132,7 @@ class Raccoon extends Group {
             }
 
             // Apply gravity
-            const gravity = -9.8;
+            const gravity = -1;
             const timeDelta = 0.1; // Convert timeStamp from ms to seconds
             this.state.verticalVelocity += gravity * timeDelta;
 
@@ -150,11 +163,6 @@ class Raccoon extends Group {
                     );
                     if (distance && distance < EPS) {
                         closestStudent.handleCollision();
-                        // Create and dispatch a custom event with details
-                        const event = new CustomEvent('studentKilled', {
-                            detail: { killedBy: this },
-                        });
-                        document.dispatchEvent(event);
                     }
                 }
             }
