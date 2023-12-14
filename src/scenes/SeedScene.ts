@@ -235,25 +235,47 @@ class SeedScene extends Scene {
         if (!carBoundingBox.intersectsBox(grassBoundingBox)) {
             // Calculate the distance between the car and the box
             let distanceX = 0;
-            let distanceY = 0;
+            let distanceZ = 0;
 
-            if (carBoundingBox.min.x < grassBoundingBox.min.x + 10) {
+            if (carBoundingBox.min.x < grassBoundingBox.min.x) {
                 distanceX = carBoundingBox.min.x - grassBoundingBox.min.x;
-            } else if (carBoundingBox.max.x > grassBoundingBox.max.x - 10) {
+            } else if (carBoundingBox.max.x > grassBoundingBox.max.x) {
                 distanceX = carBoundingBox.max.x - grassBoundingBox.max.x;
             }
 
-            if (carBoundingBox.min.y < grassBoundingBox.min.y + 10) {
-                distanceY = carBoundingBox.min.y - grassBoundingBox.min.y;
-            } else if (carBoundingBox.max.y > grassBoundingBox.max.y - 10) {
-                distanceY = carBoundingBox.max.y - grassBoundingBox.max.y;
+            if (carBoundingBox.min.z < grassBoundingBox.min.z) {
+                distanceZ = carBoundingBox.min.z - grassBoundingBox.min.z;
+            } else if (carBoundingBox.max.z > grassBoundingBox.max.z) {
+                distanceZ = carBoundingBox.max.z - grassBoundingBox.max.z;
             }
 
             // Move the car back by the calculated distances
             this.car.position.x -= distanceX;
-            this.car.position.y -= distanceY;
+            this.car.position.z -= distanceZ;
 
-            this.car.setVelocityZero();
+            // this.car.setVelocityZero();
+        }
+
+        if (carBoundingBox.intersectsBox(schoolBoundingBox)) {
+            // Calculate the distance between the car and the box
+            let distanceX = 0;
+            let distanceZ = 0;
+
+            if (carBoundingBox.min.x > schoolBoundingBox.min.x) {
+                distanceX = carBoundingBox.min.x - schoolBoundingBox.min.x;
+            } else if (carBoundingBox.max.x < schoolBoundingBox.max.x) {
+                distanceX = carBoundingBox.max.x - schoolBoundingBox.max.x;
+            }
+
+            if (carBoundingBox.min.z > schoolBoundingBox.min.z) {
+                distanceZ = carBoundingBox.min.z - schoolBoundingBox.min.z;
+            } else if (carBoundingBox.max.z < schoolBoundingBox.max.z) {
+                distanceZ = carBoundingBox.max.z - schoolBoundingBox.max.z;
+            }
+
+            // Move the car back by the calculated distances
+            this.car.position.x += distanceX;
+            this.car.position.z += distanceZ;
         }
 
         for (const obj of updateList) {
