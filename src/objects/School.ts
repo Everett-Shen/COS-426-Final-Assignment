@@ -9,11 +9,13 @@ export default class School extends Object3D {
         // Load the model
         const loader = new GLTFLoader();
         loader.load(
-            'school_v1.glb',
+            'School_v2.glb',
             (glb) => {
                 console.log('School model loaded successfully');
                 const model = glb.scene; // Access the scene from the GLTF
-                model.scale.set(5, 5, 5) // Adjust scale as needed
+                model.scale.set(1.5, 1.5, 1.5) // Adjust scale as needed
+                model.position.x -= 50;
+                model.position.y += 3;
                 model.rotation.y = Math.PI; // Adjust rotation as needed
                 this.add(model); // Add the model to the School object
             },

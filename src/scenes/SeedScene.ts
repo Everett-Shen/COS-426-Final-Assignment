@@ -12,6 +12,7 @@ import Raccoon from '../objects/Raccoon';
 import BasicLights from '../lights/BasicLights';
 import Student from '../objects/Student';
 import Car from '../objects/Car'; // Import the Car class
+import Grass from '../objects/grass';
 import School from '../objects/School';
 
 type UpdateChild = {
@@ -23,8 +24,8 @@ const MAP_WIDTH = 70;
 
 class SeedScene extends Scene {
     private car: Car; //  property for the car
-    private school: School; // property for the school
-    private pointsText: Mesh;
+    private grass: Grass; // property for the school
+    private school: School;
 
     state: {
         gui: dat.GUI;
@@ -77,6 +78,10 @@ class SeedScene extends Scene {
         this.add(this.car); // Add the car to the scene
         this.addToUpdateList(this.car); // Add the car to the update list
 
+        // initialize the grass
+        this.grass = new Grass();
+        this.add(this.grass);
+
         // initialize the school
         this.school = new School();
         this.add(this.school);
@@ -86,6 +91,8 @@ class SeedScene extends Scene {
 
         const lights = new BasicLights();
         this.add(lights);
+
+        // this.state.gui.add()
 
         // Adding raccoons
         for (let i = 0; i < RACCOON_COUNT; i++) {
@@ -124,38 +131,35 @@ class SeedScene extends Scene {
     update(timeStamp: number): void {
         const { updateList, raccoons, students } = this.state;
         const carBoundingBox = this.car.getBoundingBox(); // Correctly access the car property
-        const schoolBoundingBox = this.school.getBoundingBox()
+        const grassBoundingBox = this.grass.getBoundingBox()
 
         raccoons.forEach((raccoon) => {
             if (carBoundingBox.intersectsBox(raccoon.getBoundingBox())) {
                 raccoon.handleCollision();
-                this.state.points += 1;
-                console.log(this.state.points);
             }
         });
 
         students.forEach((student) => {
             if (carBoundingBox.intersectsBox(student.getBoundingBox())) {
                 student.handleCollision();
-                this.state.points -= 1;
             }
         });
 
-        if (!carBoundingBox.intersectsBox(schoolBoundingBox)) {
+        if (!carBoundingBox.intersectsBox(grassBoundingBox)) {
             // Calculate the distance between the car and the box
             let distanceX = 0;
             let distanceY = 0;
 
-            if (carBoundingBox.min.x < schoolBoundingBox.min.x + 10) {
-                distanceX = carBoundingBox.min.x - schoolBoundingBox.min.x;
-            } else if (carBoundingBox.max.x > schoolBoundingBox.max.x - 10) {
-                distanceX = carBoundingBox.max.x - schoolBoundingBox.max.x;
+            if (carBoundingBox.min.x < grassBoundingBox.min.x + 10) {
+                distanceX = carBoundingBox.min.x - grassBoundingBox.min.x;
+            } else if (carBoundingBox.max.x > grassBoundingBox.max.x - 10) {
+                distanceX = carBoundingBox.max.x - grassBoundingBox.max.x;
             }
 
-            if (carBoundingBox.min.y < schoolBoundingBox.min.y + 10) {
-                distanceY = carBoundingBox.min.y - schoolBoundingBox.min.y;
-            } else if (carBoundingBox.max.y > schoolBoundingBox.max.y - 10) {
-                distanceY = carBoundingBox.max.y - schoolBoundingBox.max.y;
+            if (carBoundingBox.min.y < grassBoundingBox.min.y + 10) {
+                distanceY = carBoundingBox.min.y - grassBoundingBox.min.y;
+            } else if (carBoundingBox.max.y > grassBoundingBox.max.y - 10) {
+                distanceY = carBoundingBox.max.y - grassBoundingBox.max.y;
             }
 
             // Move the car back by the calculated distances
