@@ -267,10 +267,7 @@ class SeedScene extends Scene {
                 !student.state.isDead &&
                 studentBoundingBox.intersectsBox(studentBoundingBox)
             ) {
-<<<<<<< Updated upstream
                 student.handleCollision(true);
-=======
-                student.handleCollision();
             } else if (studentBoundingBox.intersectsBox(schoolBoundingBox)) {
                 // Calculate the intersection box
                 const intersectionBox = new THREE.Box3().copy(studentBoundingBox).intersect(schoolBoundingBox);
@@ -302,7 +299,6 @@ class SeedScene extends Scene {
                 // Move the car back by the calculated distances
                 student.position.x -= distanceX;
                 student.position.z -= distanceZ;
->>>>>>> Stashed changes
             }
         });
 
