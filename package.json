@@ -1,6 +1,6 @@
 {
     "$schema": "https://json.schemastore.org/package.json",
-    "repository": "cos426finalproject-vite",
+    "repository": "COS-426-Final-Assignment",
     "name": "battlefield-princeton-attack-of-the-raccoons",
     "type": "module",
     "version": "0.1.0",
