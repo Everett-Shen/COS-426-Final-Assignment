@@ -36,6 +36,7 @@ class SeedScene extends Scene {
     raccoonDeathSound!: Audio;
     squishSound!: Audio;
     music!: Audio;
+    crashSound!: Audio;
 
     getRandomPosition(
         existingObjects: { position: THREE.Vector3 }[],
@@ -131,7 +132,7 @@ class SeedScene extends Scene {
             this.addStudent();
         }
 
-        // Load and play the death sound
+        // death sound
         const audioLoader = new AudioLoader();
         this.deathSound = new Audio(this.listener);
         audioLoader.load('src/sounds/death.mp3', (buffer) => {
@@ -148,6 +149,11 @@ class SeedScene extends Scene {
         this.squishSound = new Audio(this.listener);
         audioLoader.load('src/sounds/squish.mp3', (buffer) => {
             this.squishSound.setBuffer(buffer);
+        });
+        // crash sound
+        this.crashSound = new Audio(this.listener);
+        audioLoader.load('src/sounds/crash.mp3', (buffer) => {
+            this.crashSound.setBuffer(buffer);
         });
 
         // load music
@@ -228,7 +234,7 @@ class SeedScene extends Scene {
                 !student.state.isDead &&
                 carBoundingBox.intersectsBox(student.getBoundingBox())
             ) {
-                student.handleCollision();
+                student.handleCollision(true);
             }
         });
 
