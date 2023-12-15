@@ -19,8 +19,8 @@ type UpdateChild = {
 };
 const RACCOON_COUNT = 10;
 const STUDENT_COUNT = 10;
-const MAP_WIDTH = 125;
-const MIN_DIST = 20;
+const MAP_WIDTH = 300;
+const MIN_DIST = 50;
 
 class SeedScene extends Scene {
     private car: Car; //  property for the car
@@ -113,7 +113,7 @@ class SeedScene extends Scene {
         this.car = new Car();
         this.add(this.car); // Add the car to the scene
         this.addToUpdateList(this.car); // Add the car to the update list
-
+        this.car.position.copy(new THREE.Vector3(0, 0, 150));
         // initialize the grass
         this.grass = new Grass();
         this.add(this.grass);
@@ -142,26 +142,22 @@ class SeedScene extends Scene {
 
         // death sound
         const audioLoader = new AudioLoader();
-        this.deathSound = new Audio(this.listener);
         audioLoader.load(deathSoundFile, (buffer) => {
-            this.deathSound.setBuffer(buffer);
+            this.deathSound = buffer;
         });
 
         // raccoon death sound
-        this.raccoonDeathSound = new Audio(this.listener);
         audioLoader.load(racconDeathSoundFile, (buffer) => {
-            this.raccoonDeathSound.setBuffer(buffer);
+            this.raccoonDeathSound = buffer;
         });
 
         // squish sound
-        this.squishSound = new Audio(this.listener);
-        audioLoader.load('src/sounds/squish.mp3', (buffer) => {
-            this.squishSound.setBuffer(buffer);
+        audioLoader.load(squishSoundFile, (buffer) => {
+            this.squishSound = buffer;
         });
         // crash sound
-        this.crashSound = new Audio(this.listener);
         audioLoader.load(crashSoundFile, (buffer) => {
-            this.crashSound.setBuffer(buffer);
+            this.crashSound = buffer;
         });
 
         // load music
@@ -177,19 +173,21 @@ class SeedScene extends Scene {
         let distance = this.car.position.distanceTo(position);
 
         if (raccoon) {
-            this.raccoonDeathSound.setVolume(
+            let raccoonDeathSound = new Audio(this.listener);
+            raccoonDeathSound.setBuffer(this.raccoonDeathSound);
+            raccoonDeathSound.setVolume(
                 Math.max(0.1 / (distance / MAP_WIDTH), 1)
             );
-            this.squishSound.setVolume(
-                Math.max(0.1 / (distance / MAP_WIDTH), 1)
-            );
-            this.raccoonDeathSound.play();
-            this.squishSound.play();
+            let squishSound = new Audio(this.listener);
+            squishSound.setBuffer(this.squishSound);
+            squishSound.setVolume(Math.max(0.1 / (distance / MAP_WIDTH), 1));
+            raccoonDeathSound.play();
+            squishSound.play();
         } else {
-            this.deathSound.setVolume(
-                Math.max(0.03 / (distance / MAP_WIDTH), 0.2)
-            );
-            this.deathSound.play();
+            let deathSound = new Audio(this.listener);
+            deathSound.setBuffer(this.deathSound);
+            deathSound.setVolume(Math.max(0.03 / (distance / MAP_WIDTH), 0.2));
+            deathSound.play();
         }
     }
 
@@ -215,6 +213,13 @@ class SeedScene extends Scene {
             scoreElement.textContent = `Live Raccoons: ${this.state.raccoons.length}`;
         }
     }
+    intersectsBuilding(thing) {
+        const schoolBoundingBoxes = this.school.getBoundingBoxes();
+        const intersections = schoolBoundingBoxes.filter((box) =>
+            thing.intersectsBox(box)
+        );
+        return intersections.length > 0;
+    }
 
     update(timeStamp: number): void {
         if (this.state.isGameOver) {
@@ -222,6 +227,7 @@ class SeedScene extends Scene {
         }
         const { updateList, raccoons, students } = this.state;
         const carBoundingBox = this.car.getBoundingBox(); // Correctly access the car property
+        const schoolBoundingBoxes = this.school.getBoundingBoxes();
         const schoolBoundingBox = this.school.getBoundingBox();
         const grassBoundingBox = this.grass.getBoundingBox();
 
@@ -317,21 +323,22 @@ class SeedScene extends Scene {
                 student.position.z -= distanceZ;
             }
         });
-
-        if (carBoundingBox.intersectsBox(schoolBoundingBox)) {
+        // building collisions
+        if (this.intersectsBuilding(carBoundingBox)) {
             // Calculate the intersection box
-            const intersectionBox = new THREE.Box3()
-                .copy(carBoundingBox)
-                .intersect(schoolBoundingBox);
+            // const intersectionBox = new THREE.Box3()
+            //     .copy(carBoundingBox)
+            //     .intersect(schoolBoundingBox);
+            this.car.reverseVelocity();
+            // // Calculate the distances to move the car out of the intersection
+            // const distanceX = intersectionBox.max.x - intersectionBox.min.x;
+            // const distanceZ = intersectionBox.max.z - intersectionBox.min.z;
 
-            // Calculate the distances to move the car out of the intersection
-            const distanceX = intersectionBox.max.x - intersectionBox.min.x;
-            const distanceZ = intersectionBox.max.z - intersectionBox.min.z;
-
-            // Move the car back by the calculated distances
-            this.car.position.x -= distanceX;
-            this.car.position.z -= distanceZ;
-        } else if (!carBoundingBox.intersectsBox(grassBoundingBox)) {
+            // // Move the car back by the calculated distances
+            // this.car.position.x -= distanceX;
+            // this.car.position.z -= distanceZ;
+        } // wall collisions
+        else if (!carBoundingBox.intersectsBox(grassBoundingBox)) {
             // Calculate the distance between the car and the box
             let distanceX = 0;
             let distanceZ = 0;

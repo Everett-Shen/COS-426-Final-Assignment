@@ -180,4 +180,7 @@ export default class Car extends Object3D {
     setVelocityZero(): void {
         this.velocity = new Vector3();
     }
+    reverseVelocity(): void {
+        this.velocity.multiplyScalar(-1);
+    }
 }
