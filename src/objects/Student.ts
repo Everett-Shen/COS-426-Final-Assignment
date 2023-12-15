@@ -91,7 +91,9 @@ class Student extends Group {
 
         this.parent.car.incrementStudentScore();
         if (car) {
-            this.parent.crashSound.play();
+            let crashSound = new Audio(this.parent.listener);
+            crashSound.setBuffer(this.parent.crashSound);
+            crashSound.play();
         }
         this.playDeathAnimation();
         this.removeSelf();
