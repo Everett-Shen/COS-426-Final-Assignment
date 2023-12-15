@@ -1,10 +1,10 @@
 {
     "$schema": "https://json.schemastore.org/package.json",
     "repository": "COS-426-Final-Assignment",
-    "name": "battlefield-princeton-attack-of-the-raccoons",
+    "name": "great-princeton-raccoon-invasion",
     "type": "module",
     "version": "0.1.0",
-    "title": "Battlefield Princeton: Attack of the Raccoons",
+    "title": "The Great Princeton Raccoon Invasion",
     "description": "A swarm of rabid raccoons have descended upon the Princeton campus. To make matters worse, there are oblivious Princeton students walking around everywhere, made unaware of their surroundings by their Dean's Date assignments. The only thing standing between them and utter oblivion is you, a sentient golf cart.",
     "keywords": [
         "Princeton",

@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import Raccoon from '../objects/Raccoon';
 import BasicLights from '../lights/BasicLights';
 import Student from '../objects/Student';
-import Car from '../objects/Car'; // Import the Car class
+import Car from '../objects/Car';
 import Grass from '../objects/grass';
 import School from '../objects/School';
 import musicSoundFile from '../sounds/music.mp3';
@@ -23,8 +23,8 @@ const MAP_WIDTH = 300;
 const MIN_DIST = 50;
 
 class SeedScene extends Scene {
-    private car: Car; //  property for the car
-    private grass: Grass; // property for the school
+    private car: Car;
+    private grass: Grass;
     private school: School;
 
     state: {
@@ -34,8 +34,8 @@ class SeedScene extends Scene {
         students: Student[];
         raccoons: Raccoon[];
         points: number;
-        lastRaccoonSpawnedTime: number;
-        lastStudentSpawnedTime: number;
+        lastSpawnedTime: number;
+        lastCollisionTime: number;
     };
     listener: AudioListener;
     deathSound!: Audio;
@@ -53,7 +53,7 @@ class SeedScene extends Scene {
         do {
             position = new THREE.Vector3(
                 Math.random() * MAP_WIDTH - MAP_WIDTH / 2,
-                0, // Assuming y is up and you want to spawn objects on the ground
+                0,
                 Math.random() * MAP_WIDTH - MAP_WIDTH / 2
             );
 
@@ -100,23 +100,21 @@ class SeedScene extends Scene {
             students: [],
             raccoons: [],
             points: 0,
-            lastRaccoonSpawnedTime: 0,
-            lastStudentSpawnedTime: 0,
+            lastSpawnedTime: 0,
+            lastCollisionTime: 0,
         };
         this.listener = new AudioListener();
 
         this.background = new Color(0x7ec0ee);
 
-        // Initialize the car
         this.car = new Car();
-        this.add(this.car); // Add the car to the scene
-        this.addToUpdateList(this.car); // Add the car to the update list
+        this.add(this.car);
+        this.addToUpdateList(this.car);
         this.car.position.copy(new THREE.Vector3(0, 0, 150));
-        // initialize the grass
+
         this.grass = new Grass();
         this.add(this.grass);
 
-        // initialize the school
         this.school = new School();
         this.add(this.school);
 
@@ -125,8 +123,6 @@ class SeedScene extends Scene {
 
         const lights = new BasicLights();
         this.add(lights);
-
-        // this.state.gui.add()
 
         // Adding raccoons
         for (let i = 0; i < RACCOON_COUNT; i++) {
@@ -193,7 +189,6 @@ class SeedScene extends Scene {
         this.state.updateList.push(object);
     }
 
-    // Getter for the car object
     getCar() {
         return this.car;
     }
@@ -226,11 +221,14 @@ class SeedScene extends Scene {
         }
 
         const { updateList, raccoons, students } = this.state;
-        const carBoundingBox = this.car.getBoundingBox(); // Correctly access the car property
+        const carBoundingBox = this.car.getBoundingBox();
         const schoolBoundingBoxes = this.school.getBoundingBoxes();
         const schoolBoundingBox = this.school.getBoundingBox();
         const grassBoundingBox = this.grass.getBoundingBox();
 
+        // avoid updating too often
+
+        // raccoon collisions
         raccoons.forEach((raccoon) => {
             const raccoonBoundingBox = raccoon.getBoundingBox();
             if (
@@ -240,20 +238,16 @@ class SeedScene extends Scene {
                 raccoon.handleCollision();
                 this.car.incrementRaccoonScore();
             } else if (raccoonBoundingBox.intersectsBox(schoolBoundingBox)) {
-                // Calculate the intersection box
                 const intersectionBox = new THREE.Box3()
                     .copy(raccoonBoundingBox)
                     .intersect(schoolBoundingBox);
 
-                // Calculate the distances to move the car out of the intersection
                 const distanceX = intersectionBox.max.x - intersectionBox.min.x;
                 const distanceZ = intersectionBox.max.z - intersectionBox.min.z;
 
-                // Move the car back by the calculated distances
                 raccoon.position.x -= distanceX;
                 raccoon.position.z -= distanceZ;
             } else if (!raccoonBoundingBox.intersectsBox(grassBoundingBox)) {
-                // Calculate the distance between the car and the box
                 let distanceX = 0;
                 let distanceZ = 0;
 
@@ -273,12 +267,11 @@ class SeedScene extends Scene {
                         raccoonBoundingBox.max.z - grassBoundingBox.max.z;
                 }
 
-                // Move the car back by the calculated distances
                 raccoon.position.x -= distanceX;
                 raccoon.position.z -= distanceZ;
             }
         });
-
+        // student collisions
         students.forEach((student) => {
             const studentBoundingBox = student.getBoundingBox();
             if (
@@ -287,7 +280,6 @@ class SeedScene extends Scene {
             ) {
                 student.handleCollision(true);
             } else if (studentBoundingBox.intersectsBox(schoolBoundingBox)) {
-                // Calculate the intersection box
                 const intersectionBox = new THREE.Box3()
                     .copy(studentBoundingBox)
                     .intersect(schoolBoundingBox);
@@ -298,7 +290,6 @@ class SeedScene extends Scene {
                 student.position.x -= distanceX;
                 student.position.z -= distanceZ;
             } else if (!studentBoundingBox.intersectsBox(grassBoundingBox)) {
-                // Calculate the distance between the car and the box
                 let distanceX = 0;
                 let distanceZ = 0;
 
@@ -318,28 +309,17 @@ class SeedScene extends Scene {
                         studentBoundingBox.max.z - grassBoundingBox.max.z;
                 }
 
-                // Move the car back by the calculated distances
                 student.position.x -= distanceX;
                 student.position.z -= distanceZ;
             }
         });
+
+        // car collisions
         // building collisions
         if (this.intersectsBuilding(carBoundingBox)) {
-            // Calculate the intersection box
-            // const intersectionBox = new THREE.Box3()
-            //     .copy(carBoundingBox)
-            //     .intersect(schoolBoundingBox);
             this.car.reverseVelocity();
-            // // Calculate the distances to move the car out of the intersection
-            // const distanceX = intersectionBox.max.x - intersectionBox.min.x;
-            // const distanceZ = intersectionBox.max.z - intersectionBox.min.z;
-
-            // // Move the car back by the calculated distances
-            // this.car.position.x -= distanceX;
-            // this.car.position.z -= distanceZ;
         } // wall collisions
         else if (!carBoundingBox.intersectsBox(grassBoundingBox)) {
-            // Calculate the distance between the car and the box
             let distanceX = 0;
             let distanceZ = 0;
 
@@ -355,7 +335,6 @@ class SeedScene extends Scene {
                 distanceZ = carBoundingBox.max.z - grassBoundingBox.max.z;
             }
 
-            // Move the car back by the calculated distances
             this.car.position.x -= distanceX;
             this.car.position.z -= distanceZ;
         }
@@ -367,12 +346,9 @@ class SeedScene extends Scene {
         }
 
         // spawn raccoons and students
-        if (timeStamp - this.state.lastRaccoonSpawnedTime > 5000) {
-            this.state.lastRaccoonSpawnedTime = timeStamp;
+        if (timeStamp - this.state.lastSpawnedTime > 5000) {
+            this.state.lastSpawnedTime = timeStamp;
             this.addRaccoon();
-        }
-        if (timeStamp - this.state.lastStudentSpawnedTime > 5000) {
-            this.state.lastStudentSpawnedTime = timeStamp;
             this.addStudent();
         }
     }

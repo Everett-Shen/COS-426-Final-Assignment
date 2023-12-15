@@ -22,7 +22,6 @@ class Student extends Group {
     constructor(parent: SeedScene) {
         super();
 
-        // Initialize state
         this.state = {
             gui: parent.state.gui,
             animate: true,
@@ -55,7 +54,6 @@ class Student extends Group {
     }
 
     playDeathAnimation = () => {
-        // Stop the current animation
         if (this.mixer) {
             const currentAction = this.mixer.clipAction(
                 this.gltfModel.animations[1]
@@ -75,9 +73,7 @@ class Student extends Group {
         this.parent.playDeathSound(this.position);
     };
     removeSelf(): void {
-        // Check if the parent's state.students array exists and contains this instance
         if (this.parent.state.students) {
-            // Filter out this instance from the parent's state.students array
             this.parent.state.students = this.parent.state.students.filter(
                 (student) => student !== this
             );

@@ -2,7 +2,6 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Object3D, Box3 } from 'three';
 
 export default class Grass extends Object3D {
-
     constructor() {
         super();
 
@@ -12,10 +11,10 @@ export default class Grass extends Object3D {
             'grass_3.glb',
             (glb) => {
                 console.log('grass model loaded successfully');
-                const model = glb.scene; // Access the scene from the GLTF
-                model.scale.set(.25, .25, .25) // Adjust scale as needed
-                model.rotation.y = Math.PI; // Adjust rotation as needed
-                this.add(model); // Add the model to the School object
+                const model = glb.scene;
+                model.scale.set(0.25, 0.25, 0.25);
+                model.rotation.y = Math.PI;
+                this.add(model);
             },
             undefined,
             (error) => {

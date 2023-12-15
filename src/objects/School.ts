@@ -10,18 +10,17 @@ export default class School extends Object3D {
     constructor() {
         super();
 
-        // Load the model
         const loader = new GLTFLoader();
         loader.load(
             'School_v2.glb',
             (glb) => {
                 console.log('School model loaded successfully');
-                const model = glb.scene; // Access the scene from the GLTF
-                model.scale.set(1.5, 1.5, 1.5); // Adjust scale as needed
+                const model = glb.scene;
+                model.scale.set(1.5, 1.5, 1.5);
                 model.position.x -= 50;
                 model.position.y += 3;
-                model.rotation.y = Math.PI; // Adjust rotation as needed
-                this.add(model); // Add the model to the School object
+                model.rotation.y = Math.PI;
+                this.add(model);
                 this.toJSON;
             },
             undefined,
@@ -30,7 +29,6 @@ export default class School extends Object3D {
             }
         );
 
-        // Create a new bounding box that will represent the combined bounding box
         const boundingBox1 = new Box3(
             new THREE.Vector3(-10, 0, -30),
             new THREE.Vector3(37, 60, 30)
@@ -50,21 +48,19 @@ export default class School extends Object3D {
             new THREE.Vector3(-65, 0, -6),
             new THREE.Vector3(-35, 60, 6)
         );
-        // Assuming you have an array of bounding boxes
+
         let boundingBoxes = [
             boundingBox1,
             boundingBox2,
             boundingBox3,
             boundingBox4,
-        ]; // Replace with your actual bounding boxes
+        ];
 
         this.boundingBoxes = boundingBoxes;
     }
     // boundingBoxes is union of smaller boxes and more accurate. BoundingBox is larger, less accurate but faster intersection
     // get the bounding box of the school
     getBoundingBoxes(): Box3 {
-        // Iterate over each bounding box
-
         return this.boundingBoxes;
     }
     getBoundingBox(): Box3 {

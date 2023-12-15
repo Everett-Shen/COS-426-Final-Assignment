@@ -8,7 +8,7 @@ export default class Car extends Object3D {
     private deceleration: number;
     private maxSpeed: number;
     private rotationSpeed: number;
-    private inputHandler: InputHandler; // An instance of InputHandler
+    private inputHandler: InputHandler;
     public raccoonScore: number;
     private studentScore: number;
 
@@ -32,10 +32,10 @@ export default class Car extends Object3D {
             'golf_cart.gltf',
             (gltf) => {
                 console.log('Car model loaded successfully');
-                const model = gltf.scene; // Access the scene from the GLTF
-                model.scale.set(0.18, 0.18, 0.18); // Adjust scale as needed
-                model.rotation.y = Math.PI; // Adjust rotation as needed
-                this.add(model); // Add the model to the Car object
+                const model = gltf.scene;
+                model.scale.set(0.18, 0.18, 0.18);
+                model.rotation.y = Math.PI;
+                this.add(model);
             },
             undefined,
             (error) => {
@@ -61,16 +61,14 @@ export default class Car extends Object3D {
         if (this.inputHandler.isKeyPressed('ArrowRight')) {
             this.turnRight();
         }
-        this.applyFriction(); // Apply friction to gradually slow down the car
+        this.applyFriction();
 
-        // Apply velocity and direction to update position and rotation
         this.applyMovement();
     }
 
     // Check if the game should end and trigger game over
     public checkGameOver(): void {
         if (this.studentScore >= 20) {
-            // Trigger game over event or call a callback
             document.dispatchEvent(new Event('gameOver'));
         }
     }
@@ -87,7 +85,6 @@ export default class Car extends Object3D {
         this.checkGameOver();
     }
 
-    // Method to update the score display
     private updateRaccoonScoreDisplay(): void {
         const scoreElement = document.getElementById('score');
         if (scoreElement) {
@@ -109,7 +106,7 @@ export default class Car extends Object3D {
         }
         // If the car is not already at max speed, increase the speed
         if (this.velocity.z > -this.maxSpeed) {
-            this.velocity.z += this.acceleration; // Increase speed by reducing the z-value (moving forward)
+            this.velocity.z += this.acceleration;
             // Clamp the velocity to not exceed the max speed
             this.velocity.z = Math.max(this.velocity.z, -this.maxSpeed);
         }
@@ -155,7 +152,6 @@ export default class Car extends Object3D {
         }
     }
 
-    // Modify the applyMovement method to apply the velocity in the direction the car is facing
     private applyMovement(): void {
         // Update velocity based on acceleration or deceleration
         this.velocity.clampLength(0, this.maxSpeed);
@@ -170,7 +166,6 @@ export default class Car extends Object3D {
         );
     }
 
-    // get the bounding box of the car
     getBoundingBox(): Box3 {
         const boundingBox = new Box3();
         boundingBox.setFromObject(this);
