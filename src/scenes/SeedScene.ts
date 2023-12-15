@@ -8,6 +8,11 @@ import Student from '../objects/Student';
 import Car from '../objects/Car'; // Import the Car class
 import Grass from '../objects/grass';
 import School from '../objects/School';
+import musicSoundFile from '../sounds/music.mp3';
+import deathSoundFile from '../sounds/death.mp3';
+import racconDeathSoundFile from '../sounds/raccoonDeath.mp3';
+import crashSoundFile from '../sounds/crash.mp3';
+import squishSoundFile from '../sounds/squish.mp3';
 
 type UpdateChild = {
     update?: (timeStamp: number) => void;
@@ -136,13 +141,13 @@ class SeedScene extends Scene {
         // death sound
         const audioLoader = new AudioLoader();
         this.deathSound = new Audio(this.listener);
-        audioLoader.load('src/sounds/death.mp3', (buffer) => {
+        audioLoader.load(deathSoundFile, (buffer) => {
             this.deathSound.setBuffer(buffer);
         });
 
         // raccoon death sound
         this.raccoonDeathSound = new Audio(this.listener);
-        audioLoader.load('src/sounds/raccoonDeath.mp3', (buffer) => {
+        audioLoader.load(racconDeathSoundFile, (buffer) => {
             this.raccoonDeathSound.setBuffer(buffer);
         });
 
@@ -153,13 +158,13 @@ class SeedScene extends Scene {
         });
         // crash sound
         this.crashSound = new Audio(this.listener);
-        audioLoader.load('src/sounds/crash.mp3', (buffer) => {
+        audioLoader.load(crashSoundFile, (buffer) => {
             this.crashSound.setBuffer(buffer);
         });
 
         // load music
         this.music = new Audio(this.listener);
-        audioLoader.load('src/sounds/music.mp3', (buffer) => {
+        audioLoader.load(musicSoundFile, (buffer) => {
             this.music.setBuffer(buffer);
             this.music.setLoop(true);
             this.music.play();
