@@ -115,7 +115,7 @@ class SeedScene extends Scene {
         this.add(this.school);
 
         // Add fog to the scene
-        this.fog = new Fog(0x7ec0ee, 100, 500); // Color, near distance, far distance
+        this.fog = new Fog(0x7ec0ee, 75, 125); // Color, near distance, far distance
 
         const lights = new BasicLights();
         this.add(lights);
@@ -220,68 +220,125 @@ class SeedScene extends Scene {
         const grassBoundingBox = this.grass.getBoundingBox();
 
         raccoons.forEach((raccoon) => {
+            const raccoonBoundingBox = raccoon.getBoundingBox()
             if (
                 !raccoon.state.isDead &&
-                carBoundingBox.intersectsBox(raccoon.getBoundingBox())
+                carBoundingBox.intersectsBox(raccoonBoundingBox)
             ) {
                 raccoon.handleCollision();
                 this.car.incrementRaccoonScore();
+            } else if (raccoonBoundingBox.intersectsBox(schoolBoundingBox)) {
+                // Calculate the intersection box
+                const intersectionBox = new THREE.Box3().copy(raccoonBoundingBox).intersect(schoolBoundingBox);
+        
+                // Calculate the distances to move the car out of the intersection
+                const distanceX = intersectionBox.max.x - intersectionBox.min.x;
+                const distanceZ = intersectionBox.max.z - intersectionBox.min.z;
+        
+                // Move the car back by the calculated distances
+                raccoon.position.x -= distanceX;
+                raccoon.position.z -= distanceZ;
+            } else if (!raccoonBoundingBox.intersectsBox(grassBoundingBox)) {
+                // Calculate the distance between the car and the box
+                let distanceX = 0;
+                let distanceZ = 0;
+        
+                if (raccoonBoundingBox.min.x < grassBoundingBox.min.x) {
+                    distanceX = raccoonBoundingBox.min.x - grassBoundingBox.min.x;
+                } else if (raccoonBoundingBox.max.x > grassBoundingBox.max.x) {
+                    distanceX = raccoonBoundingBox.max.x - grassBoundingBox.max.x;
+                }
+        
+                if (raccoonBoundingBox.min.z < grassBoundingBox.min.z) {
+                    distanceZ = raccoonBoundingBox.min.z - grassBoundingBox.min.z;
+                } else if (raccoonBoundingBox.max.z > grassBoundingBox.max.z) {
+                    distanceZ = raccoonBoundingBox.max.z - grassBoundingBox.max.z;
+                }
+        
+                // Move the car back by the calculated distances
+                raccoon.position.x -= distanceX;
+                raccoon.position.z -= distanceZ;
             }
         });
 
         students.forEach((student) => {
+            const studentBoundingBox = student.getBoundingBox()
             if (
                 !student.state.isDead &&
-                carBoundingBox.intersectsBox(student.getBoundingBox())
+                studentBoundingBox.intersectsBox(studentBoundingBox)
             ) {
+<<<<<<< Updated upstream
                 student.handleCollision(true);
+=======
+                student.handleCollision();
+            } else if (studentBoundingBox.intersectsBox(schoolBoundingBox)) {
+                // Calculate the intersection box
+                const intersectionBox = new THREE.Box3().copy(studentBoundingBox).intersect(schoolBoundingBox);
+        
+                // Calculate the distances to move the car out of the intersection
+                const distanceX = intersectionBox.max.x - intersectionBox.min.x;
+                const distanceZ = intersectionBox.max.z - intersectionBox.min.z;
+        
+                // Move the car back by the calculated distances
+                this.car.position.x -= distanceX;
+                this.car.position.z -= distanceZ;
+            } else if (!studentBoundingBox.intersectsBox(grassBoundingBox)) {
+                // Calculate the distance between the car and the box
+                let distanceX = 0;
+                let distanceZ = 0;
+        
+                if (studentBoundingBox.min.x < grassBoundingBox.min.x) {
+                    distanceX = studentBoundingBox.min.x - grassBoundingBox.min.x;
+                } else if (studentBoundingBox.max.x > grassBoundingBox.max.x) {
+                    distanceX = studentBoundingBox.max.x - grassBoundingBox.max.x;
+                }
+        
+                if (studentBoundingBox.min.z < grassBoundingBox.min.z) {
+                    distanceZ = studentBoundingBox.min.z - grassBoundingBox.min.z;
+                } else if (studentBoundingBox.max.z > grassBoundingBox.max.z) {
+                    distanceZ = studentBoundingBox.max.z - grassBoundingBox.max.z;
+                }
+        
+                // Move the car back by the calculated distances
+                student.position.x -= distanceX;
+                student.position.z -= distanceZ;
+>>>>>>> Stashed changes
             }
         });
 
-        if (!carBoundingBox.intersectsBox(grassBoundingBox)) {
+        if (carBoundingBox.intersectsBox(schoolBoundingBox)) {
+            // Calculate the intersection box
+            const intersectionBox = new THREE.Box3().copy(carBoundingBox).intersect(schoolBoundingBox);
+    
+            // Calculate the distances to move the car out of the intersection
+            const distanceX = intersectionBox.max.x - intersectionBox.min.x;
+            const distanceZ = intersectionBox.max.z - intersectionBox.min.z;
+    
+            // Move the car back by the calculated distances
+            this.car.position.x -= distanceX;
+            this.car.position.z -= distanceZ;
+            
+        } else if (!carBoundingBox.intersectsBox(grassBoundingBox)) {
             // Calculate the distance between the car and the box
             let distanceX = 0;
             let distanceZ = 0;
-
+    
             if (carBoundingBox.min.x < grassBoundingBox.min.x) {
                 distanceX = carBoundingBox.min.x - grassBoundingBox.min.x;
             } else if (carBoundingBox.max.x > grassBoundingBox.max.x) {
                 distanceX = carBoundingBox.max.x - grassBoundingBox.max.x;
             }
-
+    
             if (carBoundingBox.min.z < grassBoundingBox.min.z) {
                 distanceZ = carBoundingBox.min.z - grassBoundingBox.min.z;
             } else if (carBoundingBox.max.z > grassBoundingBox.max.z) {
                 distanceZ = carBoundingBox.max.z - grassBoundingBox.max.z;
             }
-
+    
             // Move the car back by the calculated distances
             this.car.position.x -= distanceX;
             this.car.position.z -= distanceZ;
-
-            // this.car.setVelocityZero();
-        }
-
-        if (carBoundingBox.intersectsBox(schoolBoundingBox)) {
-            // Calculate the distance between the car and the box
-            let distanceX = 0;
-            let distanceZ = 0;
-
-            if (carBoundingBox.min.x > schoolBoundingBox.min.x) {
-                distanceX = carBoundingBox.min.x - schoolBoundingBox.min.x;
-            } else if (carBoundingBox.max.x < schoolBoundingBox.max.x) {
-                distanceX = carBoundingBox.max.x - schoolBoundingBox.max.x;
-            }
-
-            if (carBoundingBox.min.z > schoolBoundingBox.min.z) {
-                distanceZ = carBoundingBox.min.z - schoolBoundingBox.min.z;
-            } else if (carBoundingBox.max.z < schoolBoundingBox.max.z) {
-                distanceZ = carBoundingBox.max.z - schoolBoundingBox.max.z;
-            }
-
-            // Move the car back by the calculated distances
-            this.car.position.x += distanceX;
-            this.car.position.z += distanceZ;
+    
         }
 
         for (const obj of updateList) {
