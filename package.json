@@ -1,19 +1,21 @@
 {
     "$schema": "https://json.schemastore.org/package.json",
-    "repository": "cos426finalproject-vite",
-    "name": "lower-case-dashed-name-of-project",
+    "repository": "COS-426-Final-Assignment",
+    "name": "battlefield-princeton-attack-of-the-raccoons",
     "type": "module",
     "version": "0.1.0",
-    "title": "PROJECT TITLE HERE",
-    "description": "SHORT DESCRIPTION OF PROJECT HERE. ONE TO TWO SENTENCES MAX",
+    "title": "Battlefield Princeton: Attack of the Raccoons",
+    "description": "A swarm of rabid raccoons have descended upon the Princeton campus. To make matters worse, there are oblivious Princeton students walking around everywhere, made unaware of their surroundings by their Dean's Date assignments. The only thing standing between them and utter oblivion is you, a sentient golf cart.",
     "keywords": [
         "Princeton",
         "graphics",
         "three.js",
         "COS 426",
-        "keywor0d",
-        "keyword1",
-        "keyword2-etc",
+        "raccoons",
+        "princeton",
+        "students",
+        "pp",
+        "zombie defense",
         "but this last entry CANNOT have a comma after it ->"
     ],
     "scripts": {

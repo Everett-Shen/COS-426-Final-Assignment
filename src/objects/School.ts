@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Object3D, Box3 } from 'three';
 import * as THREE from 'three';
@@ -13,7 +15,7 @@ export default class School extends Object3D {
             (glb) => {
                 console.log('School model loaded successfully');
                 const model = glb.scene; // Access the scene from the GLTF
-                model.scale.set(1.5, 1.5, 1.5) // Adjust scale as needed
+                model.scale.set(1.5, 1.5, 1.5); // Adjust scale as needed
                 model.position.x -= 50;
                 model.position.y += 3;
                 model.rotation.y = Math.PI; // Adjust rotation as needed

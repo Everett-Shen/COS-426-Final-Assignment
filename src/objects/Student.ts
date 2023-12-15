@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Group, Audio } from 'three';
 import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -82,14 +83,16 @@ class Student extends Group {
             );
         }
     }
-    handleCollision(): void {
-        // Set the raccoon as dead
+    handleCollision(car = false): void {
         if (this.state.isDead) {
             return;
         }
         this.state.isDead = true;
 
         this.parent.car.incrementStudentScore();
+        if (car) {
+            this.parent.crashSound.play();
+        }
         this.playDeathAnimation();
         this.removeSelf();
         this.parent.updateLiveStudents();
