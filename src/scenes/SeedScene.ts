@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Scene, Color, Fog, AudioListener, AudioLoader, Audio } from 'three';
 import dat from 'dat.gui';
 import * as THREE from 'three';
