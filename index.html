@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>COS 426 Final Project</title>
         <style>
+            @import url('https://fonts.cdnfonts.com/css/games');
             #score {
                 position: fixed;
                 top: 30px;
@@ -60,8 +61,89 @@
             #live-raccoons {
                 top: 200px; /* Adjust as needed */
             }
+            /* Left Pannel */
+            .left-panel {
+                position: fixed;
+                height: calc(100% - 70px);
+                padding-top: 800px;
+                flex-direction: column;
+                display: flex;
+                justify-content: space-between;
+                pointer-events: none;
+                padding-left: 20px;
+            }
+            .left-panel .panel-segment {
+                flex-grow: 1;
+                flex-basis: 100px;
+                padding: 20px;
+                overflow: hidden;
+            }
+            .flex-bottom {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+            }
+            .controls-title {
+                margin-bottom: 12px;
+                font-size: 25px;
+            }
+            .ctrl-row {
+                margin-bottom: 6px;
+                display: flex;
+                align-items: center;
+            }
+            .ctrl-key {
+                text-shadow: none;
+                font-weight: bold;
+                display: inline-block;
+                font-family: 'Cutive Mono', monospace;
+                padding: 2px 5px;
+                margin-right: 2px;
+                min-width: 30px;
+                text-align: center;
+                margin-left: 2px;
+                background: #eff0f2;
+                box-shadow:
+                    inset 0 0 25px #e8e8e8,
+                    0 1px 0 #c3c3c3,
+                    0 2px 0 #c9c9c9,
+                    0 2px 3px #000;
+                color: #111;
+                border-radius: 2px;
+                font-size: 20px;
+            }
+            .ctrl-desc {
+                margin-left: 20px;
+                font-size: 20px;
+            }
+            #welcome-page {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('/COS-426-Final-Assignment/logo_welcome.png') no-repeat center center; /* Update with your image path */
+                background-size: cover;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                color: white; /* Adjust text color as needed */
+            }
+            #welcome-page .welcome-message {
+                display: flex;
+                font-family: 'Games', sans-serif;
+                align-items: center;
+                justify-content: center;
+                margin-top: 200px; /* Adjust the value to shift the content down */
+            }
+            .welcome-text {
+                font-size: 4em;
+                color: white;
+                margin: 0 10px; /* Adjust spacing as needed */
+            }
         </style>
-      <script type="module" crossorigin src="/COS-426-Final-Assignment/assets/index-_TyAYgPm.js"></script>
+      <script type="module" crossorigin src="/COS-426-Final-Assignment/assets/index-E5BkK_Mw.js"></script>
     </head>
     <body>
         <div id="score">Score: 0</div>
@@ -71,10 +153,47 @@
         <div id="game-over" style="display: none">
             <h1>GAME OVER</h1>
             <p>Your final score: <span id="final-score"></span></p>
+            <h3>Press <span class="ctrl-key">Enter</span> to restart</h3>
         </div>
+
         <div id="pause" style="display: none">
             <h1>Game Paused</h1>
-            <h3>Press esc to continue</h3>
+            <h3>Press <span class="ctrl-key">Esc</span> to continue</h3>
+        </div>
+
+        <div class="left-panel flex-bottom">
+            <div class="panel-segment">
+                <div class="controls-title">Controls</div>
+                <div class="ctrl-row">
+                    <span class="ctrl-key">↑</span>
+                    <span class="ctrl-desc">Drive</span>
+                </div>
+                <div class="ctrl-row">
+                    <span class="ctrl-key">↓</span>
+                    <span class="ctrl-desc">Reverse</span>
+                </div>
+                <div class="ctrl-row">
+                    <span class="ctrl-key">←</span>
+                    <span class="ctrl-desc">Turn Left</span>
+                </div>
+                <div class="ctrl-row">
+                    <span class="ctrl-key">→</span>
+                    <span class="ctrl-desc">Turn Right</span>
+                </div>
+
+                <div class="ctrl-row">
+                    <span class="ctrl-key">Esc</span>
+                    <span class="ctrl-desc">Pause Game</span>
+                </div>
+            </div>
+        </div>
+        <div id="welcome-page">
+            <div class="welcome-message">
+                <span class="welcome-text">Press</span>
+                <span class="ctrl-key">Space</span>
+                <span class="welcome-text">to Start the Game</span>
+            </div>
         </div>
     </body>
 </html>
+
