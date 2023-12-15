@@ -30,6 +30,7 @@ class SeedScene extends Scene {
         points: number;
         lastRaccoonSpawnedTime: number;
         lastStudentSpawnedTime: number;
+        isGameOver: boolean;
     };
     listener: AudioListener;
     deathSound!: Audio;
@@ -95,6 +96,7 @@ class SeedScene extends Scene {
             points: 0,
             lastRaccoonSpawnedTime: 0,
             lastStudentSpawnedTime: 0,
+            isGameOver: false,
         };
         this.listener = new AudioListener();
 
@@ -203,11 +205,9 @@ class SeedScene extends Scene {
     }
 
     update(timeStamp: number): void {
-        // Check if the game is paused
-        if (this.paused) {
-            return; // Skip the update loop
+        if (this.state.isGameOver) {
+            return; // Skip the update loop if the game is over
         }
-
         const { updateList, raccoons, students } = this.state;
         const carBoundingBox = this.car.getBoundingBox(); // Correctly access the car property
         const schoolBoundingBox = this.school.getBoundingBox();

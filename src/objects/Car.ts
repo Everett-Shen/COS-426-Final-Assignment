@@ -69,7 +69,7 @@ export default class Car extends Object3D {
 
     // Check if the game should end and trigger game over
     public checkGameOver(): void {
-        if (this.studentScore >= 20) {
+        if (this.studentScore >= 10) {
             // Trigger game over event or call a callback
             document.dispatchEvent(new Event('gameOver'));
         }

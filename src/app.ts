@@ -16,7 +16,10 @@ const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ antialias: true });
 let animationFrameId: number;
 let isPaused = false;
+let isGameOver = false;
+let isGameStarted = false;
 const pauseScreen = document.getElementById('pause');
+const gameOverScreen = document.getElementById('game-over');
 
 // Set up camera
 camera.position.set(6, 3, -10);
@@ -33,15 +36,26 @@ document.body.appendChild(canvas);
 // Render loop
 let thirdPersonCamera = new ThirdPersonCamera(camera, scene.getCar());
 
+export function startGame() {
+    if (!isGameStarted) {
+        isGameStarted = true;
+        animationFrameId = window.requestAnimationFrame(
+            onAnimationFrameHandler
+        );
+    }
+}
+
 // Render loop
 const onAnimationFrameHandler = (timeStamp: number) => {
+    if (!isGameStarted) return;
+
     thirdPersonCamera.update(); // Update the camera position based on the car
 
     renderer.render(scene, camera);
     scene.update && scene.update(timeStamp);
     animationFrameId = window.requestAnimationFrame(onAnimationFrameHandler);
 };
-animationFrameId = window.requestAnimationFrame(onAnimationFrameHandler);
+// animationFrameId = window.requestAnimationFrame(onAnimationFrameHandler);
 
 // Resize Handler
 const windowResizeHandler = () => {
@@ -53,18 +67,15 @@ const windowResizeHandler = () => {
 windowResizeHandler();
 window.addEventListener('resize', windowResizeHandler, false);
 
-// Function to reset the game
-function resetGame() {}
-
 // Listen for the game over event
 document.addEventListener('gameOver', () => {
-    // Stop the animation loop
+    isGameOver = true;
+    scene.state.isGameOver = true; // Set the flag in SeedScene state
+
     window.cancelAnimationFrame(animationFrameId);
 
-    // Display the game over screen
-    const gameOverScreen = document.getElementById('game-over');
     if (gameOverScreen) {
-        gameOverScreen.style.display = 'block'; // Show the game over screen
+        gameOverScreen.style.display = 'block';
 
         // Update the final score text
         const finalScoreElement = document.getElementById('final-score');
@@ -78,26 +89,18 @@ document.addEventListener('gameOver', () => {
 
 // Toggle pause functionality
 document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
+    if (event.key === 'Escape' && !isGameOver) {
         isPaused = !isPaused;
         if (isPaused) {
-            // Pause the game
             window.cancelAnimationFrame(animationFrameId);
-            // Display the game pause screen
-            if (pauseScreen) pauseScreen.style.display = 'block'; // Show the pause screen
+            if (pauseScreen) pauseScreen.style.display = 'block';
         } else {
-            // Resume the game
-            if (pauseScreen) pauseScreen.style.display = 'none'; // Hide the pause screen
+            if (pauseScreen) pauseScreen.style.display = 'none';
             animationFrameId = window.requestAnimationFrame(
                 onAnimationFrameHandler
             );
         }
-    } else if (event.key === 'Enter') {
-        // Check if the game over screen is currently shown
-        const gameOverScreen = document.getElementById('game-over');
-        if (gameOverScreen && gameOverScreen.style.display === 'block') {
-            gameOverScreen.style.display = 'none'; // Hide the game over screen
-            resetGame(); // Reset the game
-        }
+    } else if (event.key === 'Enter' && isGameOver) {
+        window.location.reload();
     }
 });
